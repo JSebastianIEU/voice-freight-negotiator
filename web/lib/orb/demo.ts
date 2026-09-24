@@ -5,10 +5,10 @@
  */
 
 import type { GuardianEvent } from "@/lib/guardian";
-import type { LaneState } from "@/lib/lane/model";
+import type { AgentPhase } from "@/lib/phase";
 
 type Beat =
-  | { at: number; state: LaneState }
+  | { at: number; state: AgentPhase }
   | { at: number; event: Omit<GuardianEvent, "ts"> };
 
 const SCRIPT: Beat[] = [
@@ -37,7 +37,7 @@ const SCRIPT: Beat[] = [
 export const DEMO_LENGTH = 33;
 
 export type DemoFrame = {
-  state: LaneState;
+  state: AgentPhase;
   agentLevel: number;
   userLevel: number;
   events: GuardianEvent[];
@@ -46,7 +46,7 @@ export type DemoFrame = {
 export class DemoScript {
   private t = 0;
   private cursor = 0;
-  private state: LaneState = "idle";
+  private state: AgentPhase = "idle";
 
   /** Advance by dt seconds and return what happened. */
   step(dt: number): DemoFrame {

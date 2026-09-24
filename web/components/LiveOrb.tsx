@@ -8,22 +8,20 @@ import {
 } from "@livekit/components-react";
 import { type LocalAudioTrack, Track } from "livekit-client";
 
-import { RateLane } from "@/components/RateLane";
+import { Orb } from "@/components/Orb";
 import type { GuardianEvent } from "@/lib/guardian";
-import type { LaneState } from "@/lib/lane/model";
+import type { AgentPhase } from "@/lib/phase";
 
 /**
- * The lane fed by the live call. Must render inside a LiveKitRoom.
+ * The core fed by the live call. Must render inside a LiveKitRoom.
  *
  * Three real signals drive it:
  * - the agent's state attribute (listening / thinking / speaking), which the
  *   worker updates as its pipeline moves;
- * - the loudness of the agent's audio track, sampled from the same WebAudio
- *   analyser the BarVisualizer uses;
- * - the loudness of the local microphone, so the carrier's own voice shows up
- *   as the wave coming from the right.
+ * - the loudness of the agent's audio track (it emits);
+ * - the loudness of the local microphone (it absorbs).
  */
-export function LiveLane({ events }: { events: GuardianEvent[] }) {
+export function LiveOrb({ events }: { events: GuardianEvent[] }) {
   const { state, audioTrack } = useVoiceAssistant();
   const { microphoneTrack } = useLocalParticipant();
 
@@ -37,8 +35,8 @@ export function LiveLane({ events }: { events: GuardianEvent[] }) {
   const userLevel = useTrackVolume(micTrack);
 
   return (
-    <RateLane
-      state={toLaneState(state)}
+    <Orb
+      phase={toPhase(state)}
       agentLevel={shape(agentLevel)}
       userLevel={shape(userLevel)}
       events={events}
@@ -46,7 +44,7 @@ export function LiveLane({ events }: { events: GuardianEvent[] }) {
   );
 }
 
-export function toLaneState(state: AgentState): LaneState {
+export function toPhase(state: AgentState): AgentPhase {
   switch (state) {
     case "listening":
     case "thinking":
@@ -62,7 +60,7 @@ export function toLaneState(state: AgentState): LaneState {
   }
 }
 
-/** Raw analyser volume is quiet and linear; lift it so speech fills the lane. */
+/** Raw analyser volume is quiet and linear; lift it so speech moves the core. */
 function shape(level: number): number {
   return Math.min(1, Math.sqrt(Math.max(0, level)) * 1.6);
 }

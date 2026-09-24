@@ -10,7 +10,7 @@ import { Track } from "livekit-client";
 
 import { AgentStatus } from "@/components/AgentStatus";
 import { CallLog } from "@/components/CallLog";
-import { LiveLane } from "@/components/LiveLane";
+import { LiveOrb } from "@/components/LiveOrb";
 import { useGuardianEvents } from "@/lib/useGuardianEvents";
 
 /**
@@ -36,9 +36,9 @@ export function CallSession({ roomName }: { roomName: string }) {
         <span>room {roomName}</span>
       </div>
 
-      <LiveLane events={events} />
+      <LiveOrb events={events} />
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center gap-3">
         <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 font-mono text-xs font-medium text-neutral-950 hover:bg-white">
           hang up
         </DisconnectButton>

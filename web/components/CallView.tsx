@@ -4,7 +4,7 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { useCallback, useState } from "react";
 
 import { CallSession } from "@/components/CallSession";
-import { RateLane } from "@/components/RateLane";
+import { Orb } from "@/components/Orb";
 import { fetchConnectionDetails } from "@/lib/connection";
 import type { ConnectionDetails } from "@/lib/types";
 
@@ -58,17 +58,16 @@ export function CallView() {
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-neutral-600" />
             {requesting ? "requesting a room" : "no call"}
           </span>
-          <span>the lane is still until something happens on it</span>
         </div>
 
-        <RateLane
-          state={requesting ? "connecting" : "idle"}
+        <Orb
+          phase={requesting ? "connecting" : "idle"}
           agentLevel={0}
           userLevel={0}
           events={NO_EVENTS}
         />
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           <button
             type="button"
             onClick={startCall}
@@ -77,15 +76,15 @@ export function CallView() {
           >
             {requesting ? "connecting…" : "start call"}
           </button>
-          <p className="max-w-md text-sm text-neutral-500">
+          <p className="text-center text-sm text-neutral-500">
             You are the carrier. Use headphones so the agent does not hear itself.
           </p>
+          {phase.kind === "error" && (
+            <p role="alert" className="text-center font-mono text-xs text-amber-200">
+              {phase.message}
+            </p>
+          )}
         </div>
-        {phase.kind === "error" && (
-          <p role="alert" className="font-mono text-xs text-amber-200">
-            {phase.message}
-          </p>
-        )}
       </div>
     );
   }
