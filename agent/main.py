@@ -22,6 +22,7 @@ from livekit.agents import AgentServer, JobContext, JobProcess
 
 from freight_negotiator.agents.hello import HelloAgent
 from freight_negotiator.config import load_settings
+from freight_negotiator.metrics import TurnMetricsRecorder
 from freight_negotiator.pipeline import build_session, load_vad, room_options
 
 # Loaded before Settings so both pydantic and the LiveKit SDK see the same values.
@@ -49,6 +50,9 @@ async def entrypoint(ctx: JobContext) -> None:
     logging.getLogger().setLevel(settings.log_level)
 
     session = build_session(settings, vad=ctx.proc.userdata["vad"])
+    # One JSON line per turn with the measured latencies; this is where the
+    # README's latency number comes from.
+    TurnMetricsRecorder(settings.metrics_path).attach(session)
 
     await session.start(
         agent=HelloAgent(),
