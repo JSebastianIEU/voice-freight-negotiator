@@ -1,0 +1,32 @@
+%% Deployment: two Cloud Run services, one LiveKit Cloud project, secrets never in the browser or the repo.
+flowchart TB
+    subgraph gh["GitHub"]
+        REPO["voice-freight-negotiator"] -->|"push to main"| GA["GitHub Actions<br/>(Workload Identity Federation,<br/>no JSON keys)"]
+    end
+
+    subgraph gcp["Google Cloud"]
+        AR["Artifact Registry<br/>agent + web images"]
+        SM["Secret Manager<br/>LIVEKIT_API_KEY / SECRET"]
+        WEB["Cloud Run: web<br/>Next.js, scales to zero"]
+        AGENT["Cloud Run: agent worker<br/>min-instances 1, CPU always on"]
+        BUD["Billing budget alert"]
+    end
+
+    subgraph lk["LiveKit Cloud"]
+        LKC["Rooms + Inference<br/>(STT / LLM / TTS)<br/>spend cap"]
+    end
+
+    U["Browser"]
+
+    GA -->|"build + push"| AR
+    GA -->|"deploy"| WEB
+    GA -->|"deploy"| AGENT
+    SM -.-> WEB
+    SM -.-> AGENT
+    U -->|"GET /api/token"| WEB
+    WEB -->|"short-lived room JWT"| U
+    U <-->|"WebRTC media"| LKC
+    AGENT <-->|"worker WebSocket:<br/>receives jobs, joins rooms"| LKC
+
+    classDef secret fill:#ffe9e0,stroke:#c0392b,color:#000;
+    class SM secret;

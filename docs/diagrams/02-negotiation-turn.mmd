@@ -1,0 +1,30 @@
+%% One negotiation turn: the carrier names a price, the code decides, the LLM only phrases the answer.
+sequenceDiagram
+    autonumber
+    actor C as Carrier
+    participant R as LiveKit Room
+    participant S as STT + turn detector
+    participant L as LLM (DeepSeek)
+    participant G as Price guardian (code)
+    participant T as TTS
+
+    C->>R: "I can do it for thirty-two... fifty"
+    R->>S: audio frames (UDP)
+    Note over S: VAD sees speech, STT streams partial text.<br/>Turn detector waits: the pause after "thirty-two"<br/>is NOT an end of turn.
+    S->>L: final transcript: "I can do it for 3250"
+    L->>G: propose_rate(3250)
+    alt 3250 inside [min, max]
+        G-->>L: accepted
+        L->>G: accept_rate(3250)
+        G-->>L: deal recorded
+        L->>T: "3250 works, I'll send the rate confirmation."
+    else 3250 outside [min, max]
+        G-->>L: rejected: too high, propose another figure
+        Note over G: The tool never reveals min or max.
+        L->>G: propose_rate(2900)
+        G-->>L: accepted
+        L->>T: "I can't do 3250. I can go to 2900."
+    end
+    Note over L,T: Output filter: any $ amount in the reply that the guardian<br/>did not just validate is stripped and the LLM is re-prompted.
+    T->>R: agent audio track
+    R->>C: agent speaks

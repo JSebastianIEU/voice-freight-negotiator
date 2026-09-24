@@ -1,0 +1,17 @@
+%% Where the milliseconds go between the carrier finishing a sentence and hearing the first word back.
+flowchart LR
+    A["Carrier stops<br/>speaking"] --> B["Network<br/>UDP to LiveKit<br/>~20-50 ms"]
+    B --> C["STT final<br/>transcript<br/>~100-300 ms"]
+    C --> D["End-of-turn<br/>decision<br/>~50-150 ms"]
+    D --> E["LLM<br/>time to first token<br/>~300-800 ms"]
+    E --> F["Tool round trip<br/>propose_rate<br/>+1 LLM call when used"]
+    F --> G["TTS<br/>time to first byte<br/>~100-300 ms"]
+    G --> H["Network<br/>back to carrier<br/>~20-50 ms"]
+    H --> I["Carrier hears<br/>first word"]
+
+    classDef net fill:#e8f0fe,stroke:#1a56db,color:#000;
+    classDef model fill:#fff4e5,stroke:#d97706,color:#000;
+    classDef code fill:#ffe9e0,stroke:#c0392b,color:#000;
+    class B,H net;
+    class C,D,E,G model;
+    class F code;
