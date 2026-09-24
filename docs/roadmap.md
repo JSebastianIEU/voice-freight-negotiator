@@ -7,7 +7,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 |---|---|---|---|---|
 | 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | done |
 | 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world`, `feat/m1-latency-tuning` | 1–2 days | done |
-| 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | in review |
+| 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | done |
+| 1c | Visual identity: the Rate Lane | `feat/m1c-rate-lane` | 1–2 days | in review |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
 | 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
 | 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | planned |
@@ -36,7 +37,16 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Call button, agent state (listening / thinking / speaking), live transcript
 - [x] Empty "guardian events" panel ready for milestone 3
 - [x] `npm run lint && npm run build` clean
-- [ ] Browser conversation verified on the Mac: greeting, reply, interruption, transcript on both sides
+- [x] Browser conversation verified on the Mac: greeting, reply, interruption, transcript on both sides
+
+### 1c — Visual identity: the Rate Lane
+- [x] Visual grammar written down (`docs/design/rate-lane.md`)
+- [x] Pure lane model (scale, marker physics, waves) and canvas renderer, no WebGL
+- [x] `/demo` scripted negotiation for previews and screenshots
+- [x] Lane driven by the live call: agent state, agent audio level, microphone level
+- [x] Guardian verdicts drop onto the lane; one call log replaces transcript + verdict panels
+- [x] `prefers-reduced-motion` renders a single settled frame
+- [ ] Real call on the Mac: both waves follow the voices, state label matches
 
 ### 2 — Negotiator without hard rules
 - [ ] `Load` model with a sample lane and a `PriceRange`
