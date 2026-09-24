@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { CallView } from "@/components/CallView";
 
 /**
@@ -6,21 +8,25 @@ import { CallView } from "@/components/CallView";
  */
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-4 py-12 sm:px-6">
-      <header className="flex flex-col gap-2">
-        <p className="text-xs font-medium uppercase tracking-widest text-emerald-400">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
+      <header className="flex items-center justify-between">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400">
           Voice Freight Negotiator
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight text-neutral-50">
-          Call the agent and try to talk it out of its price.
-        </h1>
-        <p className="max-w-2xl text-neutral-400">
-          A LiveKit voice agent that negotiates a freight rate. The LLM chooses the words;
-          the code decides every number.
-        </p>
+        <Link
+          href="/demo"
+          className="font-mono text-xs text-neutral-500 underline-offset-4 hover:text-neutral-300 hover:underline"
+        >
+          demo loop
+        </Link>
       </header>
 
       <CallView />
+
+      <footer className="max-w-xl text-sm text-neutral-500">
+        A voice agent that negotiates a freight rate. The LLM chooses the words; the code
+        decides every number. Try to talk it out of its price.
+      </footer>
     </main>
   );
 }

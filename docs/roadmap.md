@@ -7,7 +7,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 |---|---|---|---|---|
 | 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | done |
 | 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world`, `feat/m1-latency-tuning` | 1–2 days | done |
-| 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | in review |
+| 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | done |
+| 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | in review |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
 | 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
 | 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | planned |
@@ -36,7 +37,17 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Call button, agent state (listening / thinking / speaking), live transcript
 - [x] Empty "guardian events" panel ready for milestone 3
 - [x] `npm run lint && npm run build` clean
-- [ ] Browser conversation verified on the Mac: greeting, reply, interruption, transcript on both sides
+- [x] Browser conversation verified on the Mac: greeting, reply, interruption, transcript on both sides
+
+### 1c — Visual identity: the Core
+- [x] First attempt (a number line, "the rate lane") built, tested in a real call and dropped: too much metaphor to decode
+- [x] Visual grammar written down (`docs/design/core.md`)
+- [x] Pure particle-sphere model (phases, springs, guardian impulses) and canvas renderer, no WebGL
+- [x] `/demo` scripted negotiation for previews and screenshots
+- [x] Core driven by the live call: agent state, agent audio level, microphone level; pointer tilt, click ping
+- [x] Guardian verdicts move the core; one call log replaces transcript + verdict panels
+- [x] `prefers-reduced-motion` renders a single settled frame
+- [ ] Real call on the Mac: the core follows both voices and the state label matches
 
 ### 2 — Negotiator without hard rules
 - [ ] `Load` model with a sample lane and a `PriceRange`
