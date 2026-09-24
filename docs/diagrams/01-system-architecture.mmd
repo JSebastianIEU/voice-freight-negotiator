@@ -1,0 +1,28 @@
+%% System architecture: who talks to whom, and what runs inside the agent process.
+flowchart LR
+    subgraph client["Carrier side"]
+        B["Browser / phone<br/>(mic + speaker)"]
+    end
+
+    subgraph lk["LiveKit Cloud"]
+        R["Room<br/>(WebRTC media over UDP)"]
+    end
+
+    subgraph worker["Agent worker (Python, Cloud Run)"]
+        direction LR
+        VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
+        STT --> TD["Turn detector<br/>LiveKit model"]
+        TD --> LLM["LLM<br/>DeepSeek chat"]
+        LLM <-->|"propose_rate(amount)<br/>accept_rate(amount)"| PG["Price guardian<br/>min/max in code"]
+        LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
+        OF --> TTS["TTS<br/>Cartesia Sonic"]
+        CTX[("Context<br/>conversation history")] -.-> LLM
+    end
+
+    B <-->|"audio in / out"| R
+    R -->|"carrier audio track"| VAD
+    TTS -->|"agent audio track"| R
+    PG -.->|"rate.proposed / rejected / accepted<br/>(data channel)"| R
+
+    classDef guard fill:#ffe9e0,stroke:#c0392b,stroke-width:2px,color:#000;
+    class PG,OF guard;
