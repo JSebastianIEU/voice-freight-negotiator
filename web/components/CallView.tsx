@@ -1,18 +1,10 @@
 "use client";
 
-import {
-  DisconnectButton,
-  LiveKitRoom,
-  RoomAudioRenderer,
-  StartAudio,
-  TrackToggle,
-} from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { LiveKitRoom } from "@livekit/components-react";
 import { useCallback, useState } from "react";
 
-import { AgentStatus } from "@/components/AgentStatus";
-import { GuardianPanel } from "@/components/GuardianPanel";
-import { Transcript } from "@/components/Transcript";
+import { CallSession } from "@/components/CallSession";
+import { RateLane } from "@/components/RateLane";
 import { fetchConnectionDetails } from "@/lib/connection";
 import type { ConnectionDetails } from "@/lib/types";
 
@@ -21,6 +13,8 @@ type Phase =
   | { kind: "requesting" }
   | { kind: "connected"; details: ConnectionDetails }
   | { kind: "error"; message: string };
+
+const NO_EVENTS: never[] = [];
 
 /**
  * The whole call screen. Owns the connection lifecycle:
@@ -32,7 +26,8 @@ type Phase =
  *
  * LiveKitRoom only mounts once we hold a token, so no WebRTC connection is
  * attempted before the user asked for one and the mic permission prompt
- * appears at the moment the user expects it.
+ * appears at the moment the user expects it. Before the call, the lane is
+ * drawn still: the picture is the same, nothing has happened on it yet.
  */
 export function CallView() {
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
@@ -55,25 +50,42 @@ export function CallView() {
   );
 
   if (phase.kind !== "connected") {
+    const requesting = phase.kind === "requesting";
     return (
-      <div className="flex flex-col items-center gap-6">
-        <button
-          type="button"
-          onClick={startCall}
-          disabled={phase.kind === "requesting"}
-          className="rounded-full bg-emerald-500 px-8 py-4 text-lg font-semibold text-neutral-950 transition hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-60"
-        >
-          {phase.kind === "requesting" ? "Connecting…" : "Start call"}
-        </button>
+      <div className="flex w-full flex-col gap-5">
+        <div className="flex items-center justify-between font-mono text-xs text-neutral-500">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-neutral-600" />
+            {requesting ? "requesting a room" : "no call"}
+          </span>
+          <span>the lane is still until something happens on it</span>
+        </div>
+
+        <RateLane
+          state={requesting ? "connecting" : "idle"}
+          agentLevel={0}
+          userLevel={0}
+          events={NO_EVENTS}
+        />
+
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            onClick={startCall}
+            disabled={requesting}
+            className="rounded-full bg-amber-300 px-6 py-2.5 font-mono text-sm font-medium text-neutral-950 transition hover:bg-amber-200 disabled:cursor-wait disabled:opacity-60"
+          >
+            {requesting ? "connecting…" : "start call"}
+          </button>
+          <p className="max-w-md text-sm text-neutral-500">
+            You are the carrier. Use headphones so the agent does not hear itself.
+          </p>
+        </div>
         {phase.kind === "error" && (
-          <p role="alert" className="max-w-md text-center text-sm text-red-400">
+          <p role="alert" className="font-mono text-xs text-amber-200">
             {phase.message}
           </p>
         )}
-        <p className="max-w-md text-center text-sm text-neutral-400">
-          You are the carrier. The agent answers, you negotiate. Use headphones so the
-          agent does not hear itself.
-        </p>
       </div>
     );
   }
@@ -88,31 +100,9 @@ export function CallView() {
       video={false}
       onDisconnected={endCall}
       onError={failCall}
-      className="flex w-full flex-col gap-6"
+      className="flex w-full flex-col"
     >
-      {/* Plays every remote audio track (the agent's voice). Without it, silence. */}
-      <RoomAudioRenderer />
-      {/* Browsers block autoplay until a user gesture; this shows a button only if needed. */}
-      <StartAudio label="Click to enable audio" />
-
-      <AgentStatus />
-
-      <div className="grid gap-6 md:grid-cols-[3fr_2fr]">
-        <Transcript />
-        <GuardianPanel />
-      </div>
-
-      <div className="flex items-center justify-center gap-3">
-        <TrackToggle
-          source={Track.Source.Microphone}
-          className="rounded-full border border-neutral-700 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-800"
-        />
-        <DisconnectButton className="rounded-full bg-red-500/90 px-5 py-2 text-sm font-medium text-white hover:bg-red-500">
-          Hang up
-        </DisconnectButton>
-      </div>
-
-      <p className="text-center text-xs text-neutral-500">room {roomName}</p>
+      <CallSession roomName={roomName} />
     </LiveKitRoom>
   );
 }
