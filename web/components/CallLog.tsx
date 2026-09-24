@@ -49,7 +49,7 @@ export function CallLog({ events }: { events: GuardianEvent[] }) {
   return (
     <section
       aria-label="Call log"
-      className="flex max-h-72 flex-col gap-1.5 overflow-y-auto border-t border-neutral-800 pt-4 font-mono text-[13px] leading-relaxed"
+      className="flex max-h-72 flex-col gap-1.5 overflow-y-auto border-t border-neutral-800 pt-4 font-mono text-[13px] leading-relaxed md:max-h-[420px] md:border-t-0 md:border-l md:pl-6 md:pt-0"
     >
       {lines.length === 0 && (
         <p className="text-neutral-600">log — the call appears here as it happens</p>

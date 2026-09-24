@@ -16,7 +16,10 @@ import { useGuardianEvents } from "@/lib/useGuardianEvents";
 /**
  * Everything that exists only while connected. Rendered inside LiveKitRoom, so
  * every hook here has a room. Guardian events are read once and handed to both
- * the lane (markers) and the log (receipts).
+ * the core (impulses) and the log (receipts).
+ *
+ * Layout: the core and its controls on the left, the log on the right at full
+ * height; on narrow screens the log drops under the core.
  */
 export function CallSession({ roomName }: { roomName: string }) {
   const events = useGuardianEvents();
@@ -36,19 +39,22 @@ export function CallSession({ roomName }: { roomName: string }) {
         <span>room {roomName}</span>
       </div>
 
-      <LiveOrb events={events} />
+      <div className="grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-stretch">
+        <div className="flex flex-col items-center gap-4">
+          <LiveOrb events={events} />
+          <div className="flex items-center gap-3">
+            <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 font-mono text-xs font-medium text-neutral-950 hover:bg-white">
+              hang up
+            </DisconnectButton>
+            <TrackToggle
+              source={Track.Source.Microphone}
+              className="rounded-full border border-neutral-700 px-4 py-2 font-mono text-xs text-neutral-300 hover:border-neutral-500"
+            />
+          </div>
+        </div>
 
-      <div className="flex items-center justify-center gap-3">
-        <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 font-mono text-xs font-medium text-neutral-950 hover:bg-white">
-          hang up
-        </DisconnectButton>
-        <TrackToggle
-          source={Track.Source.Microphone}
-          className="rounded-full border border-neutral-700 px-4 py-2 font-mono text-xs text-neutral-300 hover:border-neutral-500"
-        />
+        <CallLog events={events} />
       </div>
-
-      <CallLog events={events} />
     </div>
   );
 }

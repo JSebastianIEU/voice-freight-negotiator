@@ -8,7 +8,7 @@ import { CallView } from "@/components/CallView";
  */
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
       <header className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-400">
           Voice Freight Negotiator

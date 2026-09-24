@@ -57,8 +57,8 @@ const PHASES: Record<AgentPhase, PhaseParams> = {
   idle: { radius: 1, spin: 0.12, wobble: 0.04, shimmer: 0.01, alpha: 0.75 },
   connecting: { radius: 1, spin: 0.3, wobble: 0.1, shimmer: 0.03, alpha: 0.85 },
   listening: { radius: 1, spin: 0.25, wobble: 0.06, shimmer: 0.02, alpha: 1 },
-  thinking: { radius: 0.92, spin: 1.7, wobble: 0.45, shimmer: 0.08, alpha: 1 },
-  speaking: { radius: 1.04, spin: 0.5, wobble: 0.08, shimmer: 0.03, alpha: 1 },
+  thinking: { radius: 0.9, spin: 1.1, wobble: 0.12, shimmer: 0.06, alpha: 1 },
+  speaking: { radius: 1.0, spin: 0.45, wobble: 0.06, shimmer: 0.02, alpha: 1 },
   failed: { radius: 1.25, spin: 0.02, wobble: 0, shimmer: 0, alpha: 0.3 },
 };
 
@@ -162,12 +162,16 @@ export class OrbModel {
     // Per-particle radius targets.
     const absorb = this.userLevel * 0.45;
     const emit = this.agentLevel;
+    // Speaking: the whole sphere pulses with the voice, plus rings running over it.
+    const pulse = emit * 0.28;
+    // Thinking: a slow breath in and out, instead of nodding.
+    const breath = this.phase === "thinking" ? Math.sin(this.clock * 2.4) * 0.05 : 0;
     for (const q of this.particles) {
       const shimmer = Math.sin(this.clock * 2.1 + q.seed) * p.shimmer;
-      // Emission rings travel from the equator outward over the bands as the agent speaks.
-      const ring = emit > 0.02 ? Math.max(0, Math.sin(this.clock * 6 - q.band * 6)) * emit * 0.5 : 0;
+      // Emission rings travel from pole to pole over the bands as the agent speaks.
+      const ring = emit > 0.02 ? Math.max(0, Math.sin(this.clock * 7 - q.band * 8)) * emit * 0.35 : 0;
       const noiseAbsorb = absorb * (0.6 + 0.4 * Math.sin(q.seed * 3 + this.clock * 4));
-      const target = (p.radius + shimmer + ring + noiseAbsorb) * this.envelope;
+      const target = (p.radius + breath + pulse + shimmer + ring + noiseAbsorb) * this.envelope;
       const acc = (target - q.r) * SPRING - q.vr * DAMPING;
       q.vr += acc * dt;
       q.r += q.vr * dt;
