@@ -3,7 +3,7 @@
 > Real-time voice agent that negotiates freight rates with carriers over the phone, and can't
 > be talked out of its price limits.
 
-**Status: in progress.** Milestone 1c of 6 — see the [roadmap](docs/roadmap.md).
+**Status: in progress.** Milestone 2 of 6 — see the [roadmap](docs/roadmap.md).
 
 A carrier calls to offer a load. The agent negotiates the rate inside a range (minimum and
 maximum) and never goes outside it, no matter how much pressure, fake urgency or prompt
@@ -111,6 +111,11 @@ Each turn appends a JSON line to `agent/metrics.jsonl` with the measured latenci
 `make compare-llms` measures LLM time-to-first-token per model through Inference (no microphone
 involved) and writes a Markdown table to `agent/reports/`; that is how the LLM choice is
 justified with numbers instead of opinions.
+
+`make attacks` replays the ten-attack catalog ([docs/attacks/catalog.md](docs/attacks/catalog.md))
+against the agent in text mode and writes a pass/fail report with every transcript to
+`docs/attacks/`. Who the agent works for and what the numbers on a load mean:
+[docs/domain.md](docs/domain.md).
 
 Note: `uv run main.py console` prints a deprecation notice; LiveKit now prefers
 `lk agent console` from its CLI (`brew install livekit-cli`). Both work identically.
