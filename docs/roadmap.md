@@ -8,9 +8,9 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | done |
 | 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world`, `feat/m1-latency-tuning` | 1–2 days | done |
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | done |
-| 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | in review |
-| 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | in review |
-| 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
+| 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | done |
+| 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | done |
+| 3 | Price guardian (range, policy, tools, output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | in review |
 | 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | planned |
 | 5 | Publish: README with real numbers, demo video, article 1 | `docs/publish` | 1–2 days | planned |
 | 6 | Test bench: fake carrier, 100 calls, model comparison, Spanish | `feat/m6-test-bench` | 20–30 h | later |
@@ -59,13 +59,16 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] Voice run on the Mac of at least three attacks, transcripts in `docs/attacks/transcripts/`
 
 ### 3 — Price guardian
-- [ ] `PriceRange.validate()` pure Python, unit-tested
-- [ ] `propose_rate` / `accept_rate` tools; tool output never reveals the range
-- [ ] Prompt no longer contains any number; every price goes through a tool
-- [ ] Output filter blocks unvalidated amounts before TTS
-- [ ] Attack catalog re-run: table "after" column
-- [ ] Latency cost of the tool round trip measured
-- [ ] Web client shows guardian verdicts live
+- [x] `guardian/range.py`: validity in pure Python, unit-tested (edges, garbage input, no bound in labels)
+- [x] `guardian/policy.py`: concession ladder, "move only when the carrier moves", booking rule; the ten attacks as policy traces in tests
+- [x] `propose_rate` / `accept_rate` tools; replies carry one figure and its spoken form, never the range; per-mile converted in code
+- [x] Prompt no longer contains any number (test flipped); milestone 2 agent kept as `AGENT_PROFILE=prompt-only`
+- [x] Output filter replaces sentences with unvalidated amounts before TTS, streamed, unit-tested
+- [x] Guardian verdicts published on the data channel; the Core and the call log react
+- [x] `make attacks` / `make attacks-baseline`: same catalog, both agents, tool calls in transcripts, turn timing
+- [ ] Attack catalog re-run with the guardian: README "with guardian" column from a real run
+- [ ] Turn-time difference guardian vs prompt-only recorded in the README (cost of the tool round trip)
+- [ ] Real call on the Mac: verdicts appear in the call log and move the Core
 
 ### 4 — Deploy to GCP
 - [ ] Container images for agent and web
