@@ -16,6 +16,13 @@ from __future__ import annotations
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Name under which the worker registers with LiveKit. A room token that carries a
+# RoomAgentDispatch for this name gets this agent; rooms without it get nothing.
+# Explicit dispatch, not "join every room": the test bench adds a second agent later.
+# A constant rather than a Settings field because the name is needed at import time,
+# when the @rtc_session decorator runs. The web client repeats it in LIVEKIT_AGENT_NAME.
+AGENT_NAME = "freight-negotiator"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(

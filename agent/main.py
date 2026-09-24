@@ -21,7 +21,7 @@ from livekit import agents
 from livekit.agents import AgentServer, JobContext, JobProcess
 
 from freight_negotiator.agents.hello import HelloAgent
-from freight_negotiator.config import load_settings
+from freight_negotiator.config import AGENT_NAME, load_settings
 from freight_negotiator.metrics import TurnMetricsRecorder
 from freight_negotiator.pipeline import build_session, load_vad, room_options
 
@@ -43,7 +43,7 @@ def prewarm(proc: JobProcess) -> None:
 server = AgentServer(setup_fnc=prewarm)
 
 
-@server.rtc_session()
+@server.rtc_session(agent_name=AGENT_NAME)
 async def entrypoint(ctx: JobContext) -> None:
     """One call = one job = one AgentSession."""
     settings = load_settings()
