@@ -3,7 +3,7 @@
 > Real-time voice agent that negotiates freight rates with carriers over the phone, and can't
 > be talked out of its price limits.
 
-**Status: in progress.** Milestone 1 of 6 — see the [roadmap](docs/roadmap.md).
+**Status: in progress.** Milestone 1b of 6 — see the [roadmap](docs/roadmap.md).
 
 A carrier calls to offer a load. The agent negotiates the rate inside a range (minimum and
 maximum) and never goes outside it, no matter how much pressure, fake urgency or prompt
@@ -75,10 +75,23 @@ cp .env.example .env.local                # fill LIVEKIT_URL, LIVEKIT_API_KEY, L
 uv run -m livekit.agents download-files   # once: local model weights (Silero VAD)
 
 uv run main.py console                    # talk to the agent from the terminal
-uv run main.py dev                        # join LiveKit rooms; talk from the Agents Playground
+uv run main.py dev                        # wait for calls from LiveKit Cloud (use the web client)
 ```
 
 `make` targets wrap the same commands (`make console`, `make dev`, `make lint`, `make test`).
+
+Web client (Node 20+), in a second terminal:
+
+```bash
+cd web
+npm install
+cp .env.example .env.local                # same LiveKit values as agent/.env.local
+npm run dev                               # http://localhost:3000 -> "Start call"
+```
+
+The browser asks `/api/token` for a short-lived token scoped to one fresh room; the token
+carries a dispatch request for the agent named `freight-negotiator`, so the worker running
+`main.py dev` joins that room and only that room. The API secret never leaves the server.
 
 Every model id (STT, LLM, TTS) has a default in `agent/src/freight_negotiator/config.py` and
 can be overridden in `.env.local`; swapping the LLM is one line.

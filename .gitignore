@@ -222,3 +222,6 @@ __marimo__/
 agent/metrics.jsonl
 agent/*.jsonl
 agent/reports/*.json
+
+# The Python template above ignores lib/; the web client has a real lib/ folder.
+!web/lib/
