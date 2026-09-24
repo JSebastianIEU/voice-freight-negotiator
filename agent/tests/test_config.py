@@ -15,7 +15,7 @@ REQUIRED = {
 def test_defaults_are_the_documented_stack() -> None:
     s = Settings(**REQUIRED, _env_file=None)
     assert s.stt_model == "deepgram/nova-3"
-    assert s.llm_model.startswith("deepseek-ai/")
+    assert s.llm_model == "openai/gpt-4.1-mini"
     assert s.tts_model == "cartesia/sonic-3"
     assert s.tts_voice is None
 

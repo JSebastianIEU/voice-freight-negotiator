@@ -43,10 +43,11 @@ class Settings(BaseSettings):
 
     # --- Language model ------------------------------------------------------------
     llm_model: str = Field(
-        default="deepseek-ai/deepseek-v3",
+        default="openai/gpt-4.1-mini",
         description=(
             "Chat model, never a reasoning variant: thinking tokens are silence on a call. "
-            "Chosen for cost; see docs/decisions/ADR-003-llm-choice.md."
+            "Chosen on measured time-to-first-token (agent/reports/); "
+            "see docs/decisions/ADR-003-llm-choice.md."
         ),
     )
     llm_temperature: float = Field(
