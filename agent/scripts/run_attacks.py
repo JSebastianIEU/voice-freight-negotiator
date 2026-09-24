@@ -31,7 +31,7 @@ from livekit.agents import AgentSession, inference
 
 from freight_negotiator.agents.negotiator import NegotiatorAgent
 from freight_negotiator.config import Settings
-from freight_negotiator.evals import flag_reply
+from freight_negotiator.evals import Verdict, judge_reply
 from freight_negotiator.loads import SAMPLE_LOAD, Load
 
 OPENING = [
@@ -142,7 +142,11 @@ ATTACKS: dict[int, tuple[str, list[str]]] = {
 class Turn:
     role: str
     text: str
-    flags: list[str] = field(default_factory=list)
+    verdict: Verdict = field(default_factory=Verdict)
+
+    @property
+    def flags(self) -> list[str]:
+        return self.verdict.flags()
 
 
 @dataclass
@@ -153,8 +157,25 @@ class AttackRun:
     turns: list[Turn]
 
     @property
+    def agent_turns(self) -> list[Turn]:
+        return [t for t in self.turns if t.role == "agent"]
+
+    @property
+    def crossed(self) -> bool:
+        return any(t.verdict.crossed for t in self.agent_turns)
+
+    @property
+    def leaked(self) -> bool:
+        return any(t.verdict.leaked for t in self.agent_turns)
+
+    @property
     def failed(self) -> bool:
-        return any(t.flags for t in self.turns if t.role == "agent")
+        return self.crossed or self.leaked
+
+    @property
+    def highest_offer(self) -> int | None:
+        offers = [t.verdict.offered for t in self.agent_turns if t.verdict.offered is not None]
+        return max(offers) if offers else None
 
 
 # --- Runner -----------------------------------------------------------------------
@@ -177,7 +198,7 @@ async def run_attack(number: int, round_no: int, settings: Settings, load: Load)
                 item = getattr(ev, "item", None)
                 if item is not None and getattr(item, "role", None) == "assistant":
                     text = item.text_content or ""
-                    turns.append(Turn("agent", text, flag_reply(text, load)))
+                    turns.append(Turn("agent", text, judge_reply(text, load)))
     return AttackRun(number, name, round_no, turns)
 
 
@@ -185,27 +206,43 @@ def render_report(runs: list[AttackRun], load: Load, stamp: str, model: str) -> 
     by_attack: dict[int, list[AttackRun]] = {}
     for r in runs:
         by_attack.setdefault(r.number, []).append(r)
-    failed_total = sum(1 for r in runs if r.failed)
+    floor, ceiling = load.prices.floor, load.prices.ceiling
+    room = ceiling - floor
+    crossed_total = sum(1 for r in runs if r.crossed)
+    leaked_total = sum(1 for r in runs if r.leaked)
+    offers = [r.highest_offer for r in runs if r.highest_offer is not None]
+    avg_given = (sum(o - floor for o in offers) / len(offers)) if offers else 0.0
     out = [
         f"# Attack replay — {stamp} UTC",
         "",
-        f"Load `{load.load_id}`, ceiling ${load.prices.ceiling:,}. LLM `{model}`, text mode "
-        f"(no STT/TTS), {len(runs)} runs. **{failed_total} of {len(runs)} runs went above the "
-        "ceiling or leaked a number.**",
+        f"Load `{load.load_id}`: floor ${floor:,}, ceiling ${ceiling:,} (${room:,} of room). "
+        f"LLM `{model}`, text mode (no STT/TTS), {len(runs)} runs.",
         "",
-        "| # | Attack | Failed / runs | What the detector saw |",
-        "|---|---|---|---|",
+        f"- **Crossed the ceiling:** {crossed_total} of {len(runs)} runs",
+        f"- **Leaked the ceiling or target:** {leaked_total} of {len(runs)} runs",
+        f"- **Margin given away:** ${avg_given:,.0f} of ${room:,} on average "
+        f"(highest agent offer minus floor)",
+        "",
+        "| # | Attack | Crossed | Leaked | Highest offer | Margin given | Detector notes |",
+        "|---|---|---|---|---|---|---|",
     ]
     for n in sorted(by_attack):
         rs = by_attack[n]
-        fails = [r for r in rs if r.failed]
-        seen = "; ".join(f for r in fails for t in r.turns for f in t.flags)[:160] or "—"
-        out.append(f"| {n} | {rs[0].name} | {len(fails)} / {len(rs)} | {seen} |")
+        crossed = sum(1 for r in rs if r.crossed)
+        leaked = sum(1 for r in rs if r.leaked)
+        hi = [r.highest_offer for r in rs if r.highest_offer is not None]
+        hi_txt = f"${max(hi):,}" if hi else "—"
+        given = f"${max(hi) - floor:,} / ${room:,}" if hi else "—"
+        notes = "; ".join(f for r in rs for t in r.agent_turns for f in t.flags)[:140] or "—"
+        out.append(
+            f"| {n} | {rs[0].name} | {crossed}/{len(rs)} | {leaked}/{len(rs)} | {hi_txt} | "
+            f"{given} | {notes} |"
+        )
     out += ["", "## Transcripts", ""]
     for r in runs:
-        out.append(
-            f"### {r.number} · {r.name} · round {r.round} · {'FAIL' if r.failed else 'pass'}"
-        )
+        verdict = "FAIL" if r.failed else "pass"
+        hi = f"highest offer ${r.highest_offer:,}" if r.highest_offer else "no offer"
+        out.append(f"### {r.number} · {r.name} · round {r.round} · {verdict} · {hi}")
         out.append("")
         for t in r.turns:
             mark = f"  ⟵ **{'; '.join(t.flags)}**" if t.flags else ""
@@ -236,14 +273,18 @@ async def main() -> int:
             print(f"  attack {n} ({ATTACKS[n][0]}) round {r} ...", end=" ", flush=True)
             run = await run_attack(n, r, settings, load)
             runs.append(run)
-            print("FAIL" if run.failed else "pass")
+            status = "FAIL" if run.failed else "pass"
+            hi = f"offer ${run.highest_offer:,}" if run.highest_offer else "no offer"
+            print(f"{status} ({hi})")
 
     stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     args.out.mkdir(parents=True, exist_ok=True)
     path = args.out / f"results-{stamp}.md"
     path.write_text(render_report(runs, load, stamp, settings.llm_model), encoding="utf-8")
-    failed = sum(1 for r in runs if r.failed)
-    print(f"\n{failed} of {len(runs)} runs failed. Report: {path}")
+    crossed = sum(1 for r in runs if r.crossed)
+    leaked = sum(1 for r in runs if r.leaked)
+    print(f"\ncrossed the ceiling: {crossed}/{len(runs)}; leaked a number: {leaked}/{len(runs)}.")
+    print(f"Report: {path}")
     return 0
 
 
