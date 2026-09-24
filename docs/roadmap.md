@@ -55,7 +55,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Negotiator prompt with the limits written **in the prompt** (deliberately weak)
 - [x] Attack catalog: 10 scripted pressure / injection tactics
 - [x] `make attacks`: text-mode replay with a conservative detector, report + transcripts
-- [ ] Baseline table from a real run (`docs/attacks/results-*.md`), N of M, with transcripts
+- [x] Baseline from a real run (`docs/attacks/results-20260924-195746.md`): 0/30 crossed, 4/30 leaked, $197 of $500 margin given on average, 30 transcripts
 - [ ] Voice run on the Mac of at least three attacks, transcripts in `docs/attacks/transcripts/`
 
 ### 3 — Price guardian

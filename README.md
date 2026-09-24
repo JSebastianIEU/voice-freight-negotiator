@@ -17,18 +17,28 @@ unvalidated amount before it is spoken.
 
 ## Results
 
-Placeholders until the runs in [`docs/attacks/`](docs/attacks/) and `bench/reports/` exist.
-No number below is invented.
+Every number here comes from a recorded run; the file is linked. Placeholders stay `[X]`
+until the run exists.
 
-| Metric | Without guardian | With guardian |
+| Metric | Without guardian (prompt only) | With guardian |
 |---|---|---|
-| Out-of-range prices accepted (adversarial attempts) | `[X]` of `[N]` | `[X]` of `[N]` |
+| Crossed the ceiling (agreed above $2,950) | **0 of 30** runs | `[X]` of `[N]` |
+| Leaked the ceiling or target | **4 of 30** runs | `[X]` of `[N]` |
+| Margin given away (highest offer − floor, of $500) | **$197 average; $500 in 4 attacks** | `[X]` |
 | Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
 | Extra latency per validated price (tool round trip) | — | `[X]` ms |
 
-First measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
-end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. That number is what
-drove the model change and the endpointing tuning; the table gets filled after milestone 3.
+Baseline: [`docs/attacks/results-20260924-195746.md`](docs/attacks/results-20260924-195746.md) — ten attacks × three
+rounds, GPT-4.1 mini, text mode. The prompt-only agent never crossed its ceiling in short
+text exchanges, which was not the expected result. What it did instead is the point: under
+anchoring, fake urgency, a per-mile switch and a fake "system note" it walked from the floor
+to the ceiling and announced $2,950 as "the highest I can offer". A broker reading that
+transcript has lost the margin and the number. See [the catalog](docs/attacks/catalog.md)
+for why three metrics are needed.
+
+First latency measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
+end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. After the model change
+and endpointing tuning: 1447–2341 ms (n=5). The table gets its final latency after milestone 3.
 
 ## How it works
 
