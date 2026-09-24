@@ -1,26 +1,25 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* LiveKit's component styles are imported from layout.tsx (the package exposes them
+   through a JS import; Tailwind's CSS resolver cannot see its exports map). */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark by default: this is a demo screen that gets recorded, and audio bars read
+   better on a dark background. */
+body {
+  background: #0a0a0a;
+  color: #ededed;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* LiveKit's visualizer colors, matched to the Tailwind palette used in the components. */
+.lk-audio-bar {
+  background: #404040; /* neutral-700 */
+}
+.lk-audio-bar.lk-highlighted,
+.lk-audio-bar[data-lk-highlighted="true"] {
+  background: #0ea5e9; /* sky-500, same as the "speaking" dot */
 }

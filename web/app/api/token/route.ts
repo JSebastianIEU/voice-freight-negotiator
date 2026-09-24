@@ -19,16 +19,11 @@ import { RoomAgentDispatch, RoomConfiguration } from "@livekit/protocol";
 import { AccessToken } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
+import type { ConnectionDetails } from "@/lib/types";
+
 // Tokens are single-use in practice (one call), so a short life limits the damage
 // of a leaked one without getting in the way of a normal conversation.
 const TOKEN_TTL = "15m";
-
-export type ConnectionDetails = {
-  serverUrl: string;
-  participantToken: string;
-  roomName: string;
-  participantIdentity: string;
-};
 
 export async function POST(): Promise<NextResponse> {
   const serverUrl = process.env.LIVEKIT_URL;

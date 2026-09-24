@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// Default styles for BarVisualizer and other LiveKit components, loaded before ours.
+import "@livekit/components-styles";
 import "./globals.css";
 
 const geistSans = Geist({
