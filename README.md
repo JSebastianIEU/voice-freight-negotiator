@@ -3,7 +3,7 @@
 > Real-time voice agent that negotiates freight rates with carriers over the phone, and can't
 > be talked out of its price limits.
 
-**Status: in progress.** Milestone 0 of 6 — see the [roadmap](docs/roadmap.md).
+**Status: in progress.** Milestone 1 of 6 — see the [roadmap](docs/roadmap.md).
 
 A carrier calls to offer a load. The agent negotiates the rate inside a range (minimum and
 maximum) and never goes outside it, no matter how much pressure, fake urgency or prompt
@@ -52,7 +52,7 @@ Why each choice: [docs/decisions/](docs/decisions/).
 ## Repository layout
 
 ```
-agent/    Python worker: pipeline, negotiator agent, price guardian, tests   (milestone 1+)
+agent/    Python worker: pipeline, agents, price guardian, tests              (milestone 1+)
 web/      Next.js + TypeScript client                                        (milestone 1b+)
 bench/    test bench: fake carrier, scenarios, reports                        (milestone 6)
 deploy/   Dockerfiles and Cloud Run specs                                    (milestone 4)
@@ -61,16 +61,26 @@ docs/     architecture, roadmap, ADRs, attack catalog, article outlines
 
 ## Run it
 
-Coming with milestone 1. It will be:
+Prerequisites: Python 3.12, [uv](https://docs.astral.sh/uv/), a [LiveKit Cloud](https://cloud.livekit.io) project
+(free Build tier) with a **spend cap set** before the first call.
 
 ```bash
 cd agent
-uv sync
-cp .env.example .env.local   # LiveKit Cloud URL, key, secret
-uv run main.py download-files
-uv run main.py console        # talk from the terminal
-uv run main.py dev            # join LiveKit rooms; open the web client or the Playground
+uv sync                                   # create .venv and install everything
+cp .env.example .env.local                # fill LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET
+uv run -m livekit.agents download-files   # once: local model weights (Silero VAD)
+
+uv run main.py console                    # talk to the agent from the terminal
+uv run main.py dev                        # join LiveKit rooms; talk from the Agents Playground
 ```
+
+`make` targets wrap the same commands (`make console`, `make dev`, `make lint`, `make test`).
+
+Every model id (STT, LLM, TTS) has a default in `agent/src/freight_negotiator/config.py` and
+can be overridden in `.env.local`; swapping the LLM is one line.
+
+Each turn appends a JSON line to `agent/metrics.jsonl` with the measured latencies
+(`e2e_latency`, `llm_node_ttft`, `tts_node_ttfb`, ...). Those files feed the results table.
 
 ## Cost
 

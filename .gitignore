@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project
+.env.local
+agent/metrics.jsonl
+agent/*.jsonl
