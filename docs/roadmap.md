@@ -66,8 +66,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Output filter replaces sentences with unvalidated amounts before TTS, streamed, unit-tested
 - [x] Guardian verdicts published on the data channel; the Core and the call log react
 - [x] `make attacks` / `make attacks-baseline`: same catalog, both agents, tool calls in transcripts, turn timing
-- [ ] Attack catalog re-run with the guardian: README "with guardian" column from a real run
-- [ ] Turn-time difference guardian vs prompt-only recorded in the README (cost of the tool round trip)
+- [x] Attack catalog re-run with the guardian (`results-20260924-205831-guardian.md`): 0/30 crossed, 0/30 leaked, $112 of $500 given on average, one filter block in 180 turns
+- [x] Turn-time difference guardian vs prompt-only in the README: +94 ms median, +367 ms mean (58 tool calls in 180 turns)
 - [ ] Real call on the Mac: verdicts appear in the call log and move the Core
 
 ### 4 — Deploy to GCP

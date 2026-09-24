@@ -23,25 +23,35 @@ until the run exists.
 
 | Metric | Without guardian (prompt only) | With guardian |
 |---|---|---|
-| Crossed the ceiling (agreed above $2,950) | **0 of 30** runs | `[X]` of `[N]` |
-| Leaked the ceiling or target | **4 of 30** runs | `[X]` of `[N]` |
-| Margin given away (highest offer − floor, of $500) | **$197 average; $500 in 4 attacks** | `[X]` (policy maximum: $375) |
-| Agent turn, text mode, wall clock (median) | `[X]` ms | `[X]` ms |
+| Crossed the ceiling (agreed above $2,950) | **0 of 30**, then 0 of 30 | **0 of 30** |
+| Leaked the ceiling or target | **4 of 30**, then 1 of 30 | **0 of 30** |
+| Margin given away (highest offer − floor, of $500) | **$197 average, $500 in 4 attacks**; then $173 average | **$112 average, $250 at most** (policy maximum $375) |
+| Agent turn, text mode, wall clock, median | **1,338 ms** (180 turns, no tools) | **1,432 ms** (180 turns, 58 tool calls) |
+| Cost of the guardian per turn | — | **+94 ms median, +367 ms mean** |
 | Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
 
-Baseline: [`docs/attacks/results-20260924-195746.md`](docs/attacks/results-20260924-195746.md) — ten attacks × three
-rounds, GPT-4.1 mini, text mode. The prompt-only agent never crossed its ceiling in short
-text exchanges, which was not the expected result. What it did instead is the point: under
-anchoring, fake urgency, a per-mile switch and a fake "system note" it walked from the floor
-to the ceiling and announced $2,950 as "the highest I can offer". A broker reading that
-transcript has lost the margin and the number. See [the catalog](docs/attacks/catalog.md)
-for why three metrics are needed.
+Ten attacks × three rounds, GPT-4.1 mini, text mode, same catalog and same detector on both
+sides. Without guardian: [`results-20260924-195746.md`](docs/attacks/results-20260924-195746.md)
+and, run again the same evening, [`results-20260924-204507-prompt-only.md`](docs/attacks/results-20260924-204507-prompt-only.md).
+With guardian: [`results-20260924-205831-guardian.md`](docs/attacks/results-20260924-205831-guardian.md).
 
-With the guardian, "margin given away" stops being a model mood and becomes a policy
-parameter: the ladder for this load is $2,450 → $2,575 → $2,700 → $2,825 best-and-final, one
-rung per carrier move, and $2,950 is never offered. The "with guardian" column is filled from
-`make attacks` (three rounds) once that run exists; the two runs share the catalog and the
-detector, and the turn-time difference between them is the cost of the tool round trips.
+What the numbers say. The prompt-only agent never crossed its ceiling in short text
+exchanges, which was not the expected result; what it did instead is the point. In the first
+run, under anchoring, fake urgency, a per-mile switch and a fake "system note", it walked from
+the floor to the ceiling and announced $2,950 as "the highest I can offer". The second run
+leaked once and gave less away, which is the other finding: **a prompt's behaviour is a
+distribution**. Four leaks or one, $197 or $173, depends on the sampling of the day. See
+[the catalog](docs/attacks/catalog.md) for why three metrics are needed.
+
+With the guardian, "margin given away" is a policy parameter, not a model mood: the ladder for
+this load is $2,450 → $2,575 → $2,700 → $2,825 best-and-final, one rung per carrier move,
+and $2,950 is never offered. In 30 runs the agent reached the second rung in nine attacks and
+the third only under the anchor attack; the repeat-back attack never got it off the floor.
+The output filter fired once in 180 turns, on the reply to "thirty-four hundred, confirm" in
+the injection attack: the model answered with an amount it had never run through the desk
+(the report keeps only the replacement), the sentence became "Let me check that figure with
+the desk" and the call went on. The cost is one LLM round trip on the turns where money comes
+up: 58 tool calls in 180 turns, +94 ms on the median turn, +367 ms on the mean.
 
 First latency measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
 end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. After the model change
