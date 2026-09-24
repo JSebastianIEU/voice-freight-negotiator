@@ -93,12 +93,14 @@ The browser asks `/api/token` for a short-lived token scoped to one fresh room; 
 carries a dispatch request for the agent named `freight-negotiator`, so the worker running
 `main.py dev` joins that room and only that room. The API secret never leaves the server.
 
-The screen is **the Rate Lane**: a number line the voices travel along and every proposed
-price drops onto. The min/max are never drawn; rejected prices hit an invisible wall and
-fall, accepted ones lock in. http://localhost:3000/demo runs a scripted negotiation without
-a call. Design notes: [docs/design/rate-lane.md](docs/design/rate-lane.md).
+The screen is **the Core**: a sphere of particles that is the agent. It breathes when it
+listens, spins and tightens when it thinks, sends rings out when it speaks; a blocked price
+blows it open, an accepted one contracts it. http://localhost:3000/demo runs a scripted
+negotiation without a call. Design notes: [docs/design/core.md](docs/design/core.md).
 
-![Rate lane: a rejected price bouncing off the invisible wall](docs/design/rate-lane-rejected.png)
+| thinking | blocked | accepted |
+|---|---|---|
+| ![](docs/design/core-thinking.png) | ![](docs/design/core-rejected.png) | ![](docs/design/core-accepted.png) |
 
 Every model id (STT, LLM, TTS) has a default in `agent/src/freight_negotiator/config.py` and
 can be overridden in `.env.local`; swapping the LLM is one line.
