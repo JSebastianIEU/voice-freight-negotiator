@@ -10,22 +10,16 @@ import { Track } from "livekit-client";
 
 import { AgentStatus } from "@/components/AgentStatus";
 import { CallLog } from "@/components/CallLog";
-import { LiveOrb } from "@/components/LiveOrb";
-import { useGuardianEvents } from "@/lib/useGuardianEvents";
+import type { GuardianEvent } from "@/lib/guardian";
 
 /**
- * Everything that exists only while connected. Rendered inside LiveKitRoom, so
- * every hook here has a room. Guardian events are read once and handed to both
- * the core (impulses) and the log (receipts).
- *
- * Layout: the core and its controls on the left, the log on the right at full
- * height; on narrow screens the log drops under the core.
+ * The right column while connected: status line, controls and the log.
+ * Rendered inside LiveKitRoom, so every hook here has a room. The core itself
+ * lives outside the room (see CallView) and gets its signals from LiveSignals.
  */
-export function CallSession({ roomName }: { roomName: string }) {
-  const events = useGuardianEvents();
-
+export function CallSession({ roomName, events }: { roomName: string; events: GuardianEvent[] }) {
   return (
-    <div className="flex w-full flex-col gap-5">
+    <div className="flex h-full min-w-0 flex-col gap-4">
       {/* Plays every remote audio track (the agent's voice). Without it, silence. */}
       <RoomAudioRenderer />
       {/* Browsers block autoplay until a user gesture; shows a button only if needed. */}
@@ -34,27 +28,22 @@ export function CallSession({ roomName }: { roomName: string }) {
         className="rounded-full border border-amber-300/60 px-4 py-2 font-mono text-xs text-amber-200"
       />
 
-      <div className="flex items-center justify-between font-mono text-xs text-neutral-500">
+      <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-neutral-500">
         <AgentStatus />
-        <span>room {roomName}</span>
+        <span className="truncate">room {roomName}</span>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-stretch">
-        <div className="flex flex-col items-center gap-4">
-          <LiveOrb events={events} />
-          <div className="flex items-center gap-3">
-            <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 font-mono text-xs font-medium text-neutral-950 hover:bg-white">
-              hang up
-            </DisconnectButton>
-            <TrackToggle
-              source={Track.Source.Microphone}
-              className="rounded-full border border-neutral-700 px-4 py-2 font-mono text-xs text-neutral-300 hover:border-neutral-500"
-            />
-          </div>
-        </div>
-
-        <CallLog events={events} />
+      <div className="flex items-center gap-3">
+        <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 font-mono text-xs font-medium text-neutral-950 hover:bg-white">
+          hang up
+        </DisconnectButton>
+        <TrackToggle
+          source={Track.Source.Microphone}
+          className="rounded-full border border-neutral-700 px-4 py-2 font-mono text-xs text-neutral-300 hover:border-neutral-500"
+        />
       </div>
+
+      <CallLog events={events} />
     </div>
   );
 }

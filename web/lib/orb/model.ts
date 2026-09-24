@@ -175,11 +175,16 @@ export class OrbModel {
       const acc = (target - q.r) * SPRING - q.vr * DAMPING;
       q.vr += acc * dt;
       q.r += q.vr * dt;
+      if (!Number.isFinite(q.r)) {
+        // Self-heal instead of staying invisible forever.
+        q.r = p.radius;
+        q.vr = 0;
+      }
     }
 
     for (const r of this.rings) {
       r.age += dt;
-      r.r = 1 + r.age * 1.6;
+      r.r = 1 + r.age * 1.0;
     }
     this.rings = this.rings.filter((r) => r.age < RING_SECONDS);
     for (const v of this.verdicts) v.age += dt;
@@ -208,5 +213,8 @@ function smooth(current: number, target: number): number {
 }
 
 function clamp01(v: number): number {
+  // NaN fails every comparison, so guard it explicitly: one NaN level would
+  // spread through the springs and blank the whole sphere.
+  if (!Number.isFinite(v)) return 0;
   return v < 0 ? 0 : v > 1 ? 1 : v;
 }

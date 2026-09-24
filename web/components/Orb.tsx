@@ -24,7 +24,7 @@ export type OrbProps = {
  * pixels. Props are mirrored into refs so the loop never restarts on re-render.
  * The pointer tilts the sphere; a click pings it.
  */
-export function Orb({ phase, agentLevel, userLevel, events, size = 360, className }: OrbProps) {
+export function Orb({ phase, agentLevel, userLevel, events, size = 340, className }: OrbProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modelRef = useRef<OrbModel | null>(null);
   if (!modelRef.current) modelRef.current = new OrbModel();
@@ -47,6 +47,10 @@ export function Orb({ phase, agentLevel, userLevel, events, size = 360, classNam
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (process.env.NODE_ENV !== "production") {
+      // Debug handle for the browser console; stripped from production builds.
+      (window as unknown as { __orb?: OrbModel }).__orb = model;
+    }
 
     let width = 0;
     let height = 0;
@@ -54,9 +58,16 @@ export function Orb({ phase, agentLevel, userLevel, events, size = 360, classNam
       const dpr = window.devicePixelRatio || 1;
       width = canvas.clientWidth;
       height = canvas.clientHeight;
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+      const pw = Math.round(width * dpr);
+      const ph = Math.round(height * dpr);
+      if (canvas.width === pw && canvas.height === ph) return;
+      // Assigning the bitmap size wipes the canvas. During a layout transition
+      // ResizeObserver fires after every animation frame, i.e. right after we
+      // drew, so redraw here or the sphere is invisible while the page moves.
+      canvas.width = pw;
+      canvas.height = ph;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(ctx, model, { width, height });
     };
     fit();
     const ro = new ResizeObserver(fit);

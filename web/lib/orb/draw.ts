@@ -26,7 +26,8 @@ export function draw(
 
   const cx = width / 2;
   const cy = height / 2;
-  const R = Math.min(width, height) * 0.3;
+  // Small enough that bursts (up to ~1.6 R) and rings (up to 1.9 R) stay inside the canvas.
+  const R = Math.min(width, height) * 0.22;
 
   const cosY = Math.cos(model.rotY);
   const sinY = Math.sin(model.rotY);
