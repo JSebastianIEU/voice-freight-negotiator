@@ -26,6 +26,10 @@ No number below is invented.
 | Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
 | Extra latency per validated price (tool round trip) | — | `[X]` ms |
 
+First measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
+end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. That number is what
+drove the model change and the endpointing tuning; the table gets filled after milestone 3.
+
 ## How it works
 
 ```
@@ -39,7 +43,7 @@ carrier audio → VAD → STT → turn detection → LLM (+ price guardian tools
 | VAD | Silero | "is someone speaking?" — cheap, local, powers interruptions |
 | STT | Deepgram Nova-3 | streaming partials, good with numbers |
 | Turn detection | LiveKit turn-detector model | "did they finish, or pause mid-number?" |
-| LLM | DeepSeek chat (non-reasoning) | small, fast, cheap; reasoning = silence on a call |
+| LLM | GPT-4.1 mini (non-reasoning) | chosen on measured time-to-first-token: 705 ms vs 2153 ms for DeepSeek V3 ([report](agent/reports/llm-latency-20260924-084336.md)); reasoning = silence on a call |
 | Price guardian | plain Python | limits in code; tool never reveals them; output filter as second layer |
 | TTS | Cartesia Sonic | lowest time-to-first-byte |
 | Models via | LiveKit Inference | one key, one spend cap, model swap in one line |

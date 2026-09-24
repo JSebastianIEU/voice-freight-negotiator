@@ -6,7 +6,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | # | Milestone | Branch | Effort | Status |
 |---|---|---|---|---|
 | 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | done |
-| 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world` | 1–2 days | in review |
+| 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world`, `feat/m1-latency-tuning` | 1–2 days | done |
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | planned |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
 | 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
@@ -23,10 +23,11 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] README skeleton with result placeholders (no invented numbers)
 
 ### 1 — Voice hello world
-- [ ] `uv run main.py console`: talk to the agent from the terminal
-- [ ] `uv run main.py dev` + LiveKit Agents Playground: talk from the browser
-- [ ] Interrupting the agent mid-sentence works
+- [x] `uv run main.py console`: talk to the agent from the terminal
+- [ ] `uv run main.py dev` + LiveKit Agents Playground: talk from the browser (moved to 1b, tested with the web client)
 - [x] Per-turn latency (end-of-turn → first audio byte) logged as JSONL
+- [x] LLM chosen on measured TTFT (`make compare-llms`, see ADR-003)
+- [x] Endpointing delays tuned after the first measurement (3 s → 1.2 s max)
 - [ ] LiveKit Cloud spend cap set and documented
 
 ### 1b — Web client
