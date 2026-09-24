@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentServer, JobContext, JobProcess
 
-from freight_negotiator.agents.hello import HelloAgent
+from freight_negotiator.agents import build_profile
 from freight_negotiator.config import AGENT_NAME, load_settings
 from freight_negotiator.metrics import TurnMetricsRecorder
 from freight_negotiator.pipeline import build_session, load_vad, room_options
@@ -54,14 +54,15 @@ async def entrypoint(ctx: JobContext) -> None:
     # README's latency number comes from.
     TurnMetricsRecorder(settings.metrics_path).attach(session)
 
+    profile = build_profile(settings)
     await session.start(
-        agent=HelloAgent(),
+        agent=profile.agent,
         room=ctx.room,
         room_options=room_options(),
     )
 
-    # The agent speaks first so the user knows the line is open.
-    await session.generate_reply(instructions="Greet the user briefly and ask how you can help.")
+    # The agent speaks first so the caller knows the line is open.
+    await session.generate_reply(instructions=profile.greeting)
 
 
 if __name__ == "__main__":

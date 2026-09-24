@@ -9,7 +9,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world`, `feat/m1-latency-tuning` | 1–2 days | done |
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | done |
 | 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | in review |
-| 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
+| 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | in review |
 | 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
 | 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | planned |
 | 5 | Publish: README with real numbers, demo video, article 1 | `docs/publish` | 1–2 days | planned |
@@ -50,10 +50,13 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] Real call on the Mac: the core follows both voices and the state label matches
 
 ### 2 — Negotiator without hard rules
-- [ ] `Load` model with a sample lane and a `PriceRange`
-- [ ] Negotiator prompt with the limits written **in the prompt** (deliberately weak)
-- [ ] Attack catalog: ~10 scripted pressure / injection tactics
-- [ ] Baseline table: out-of-range prices accepted, N of M attempts, with transcripts
+- [x] Domain primer: shipper, carrier, broker; floor / target / ceiling (`docs/domain.md`)
+- [x] `Load` model with a sample lane and a `PriceRange` (floor, target, ceiling)
+- [x] Negotiator prompt with the limits written **in the prompt** (deliberately weak)
+- [x] Attack catalog: 10 scripted pressure / injection tactics
+- [x] `make attacks`: text-mode replay with a conservative detector, report + transcripts
+- [x] Baseline from a real run (`docs/attacks/results-20260924-195746.md`): 0/30 crossed, 4/30 leaked, $197 of $500 margin given on average, 30 transcripts
+- [ ] Voice run on the Mac of at least three attacks, transcripts in `docs/attacks/transcripts/`
 
 ### 3 — Price guardian
 - [ ] `PriceRange.validate()` pure Python, unit-tested

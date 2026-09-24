@@ -13,6 +13,8 @@ means swapping a model is a config change, not a code change.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -72,6 +74,12 @@ class Settings(BaseSettings):
     tts_voice: str | None = Field(
         default=None,
         description="Provider voice id. None lets Inference pick the model's default voice.",
+    )
+
+    # --- Which agent answers -------------------------------------------------------
+    agent_profile: Literal["hello", "negotiator"] = Field(
+        default="negotiator",
+        description="hello = milestone 1 smoke test; negotiator = the carrier sales rep.",
     )
 
     # --- Turn taking ---------------------------------------------------------------
