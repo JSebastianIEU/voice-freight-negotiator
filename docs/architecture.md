@@ -66,9 +66,13 @@ Three processes, three responsibilities:
 | **LiveKit Cloud** | Managed | Move audio between participants with the lowest possible latency; host the STT/LLM/TTS inference gateway |
 | **Agent worker** | Our Python process on Cloud Run | Join the room as a participant and run the pipeline |
 
-The worker is *not* a web server. It opens a WebSocket to LiveKit Cloud, says "I can take jobs",
-and LiveKit dispatches a job each time a room needs an agent. That single fact drives the
-deployment choice in section 9.
+The worker is *not* a web server. It opens a WebSocket to LiveKit Cloud, says "I can take jobs
+for the agent named `freight-negotiator`", and LiveKit dispatches a job each time a room asks
+for that agent. The ask travels inside the room token the web client mints (a
+`RoomAgentDispatch`), so the worker joins exactly the rooms that requested it and no others;
+this is *explicit dispatch*, and it is what lets a second agent (the fake carrier in the test
+bench) exist without the two ever colliding. That single fact, a long-lived process waiting for
+jobs, drives the deployment choice in section 9.
 
 ## 3. Transport: why WebRTC and not WebSockets
 
