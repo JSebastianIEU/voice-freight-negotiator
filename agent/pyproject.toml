@@ -1,0 +1,46 @@
+[project]
+name = "freight-negotiator"
+version = "0.1.0"
+description = "Voice agent that negotiates freight rates with carriers and cannot be talked out of its price limits."
+license = "MIT"
+authors = [{ name = "Juan Sebastián Peña Donneys" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    # Voice agent framework. Extras: local VAD (silero), local end-of-turn model (turn-detector).
+    "livekit-agents[silero,turn-detector]~=1.8",
+    # Background voice cancellation, free on LiveKit Cloud.
+    "livekit-plugins-noise-cancellation~=0.2",
+    # Typed settings loaded from the environment / .env.local.
+    "pydantic-settings~=2.6",
+    "python-dotenv~=1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "pytest-asyncio~=0.24",
+    "ruff~=0.7",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/freight_negotiator"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# E/F: pyflakes + pycodestyle, I: import order, B: bugbear, UP: modern syntax, SIM: simplifications.
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "integration: needs LiveKit credentials and network; skipped in CI",
+]

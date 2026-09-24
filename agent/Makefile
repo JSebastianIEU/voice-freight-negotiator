@@ -1,0 +1,32 @@
+# Day-to-day commands. Run from agent/.
+
+.PHONY: install download-files console dev start lint format test test-integration
+
+install:            ## Create the virtualenv and install everything (incl. dev tools)
+	uv sync
+
+download-files:     ## Fetch local model weights (Silero VAD, turn detector). Run once.
+	uv run main.py download-files
+
+console:            ## Talk to the agent from the terminal (no LiveKit room needed)
+	uv run main.py console
+
+dev:                ## Join LiveKit rooms with auto-reload; use the web client or the Playground
+	uv run main.py dev
+
+start:              ## Production mode
+	uv run main.py start
+
+lint:               ## Static checks
+	uv run ruff check .
+	uv run ruff format --check .
+
+format:             ## Auto-fix imports and formatting
+	uv run ruff check --fix .
+	uv run ruff format .
+
+test:               ## Offline unit tests only
+	uv run pytest -m "not integration"
+
+test-integration:   ## Tests that call real models (needs .env.local)
+	uv run pytest -m integration
