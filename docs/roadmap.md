@@ -10,8 +10,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | done |
 | 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | done |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | done |
-| 3 | Price guardian (range, policy, tools, output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | in review |
-| 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | planned |
+| 3 | Price guardian (range, policy, tools, output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | done |
+| 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | in review |
 | 5 | Publish: README with real numbers, demo video, article 1 | `docs/publish` | 1–2 days | planned |
 | 6 | Test bench: fake carrier, 100 calls, model comparison, Spanish | `feat/m6-test-bench` | 20–30 h | later |
 
@@ -71,12 +71,13 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] Real call on the Mac: verdicts appear in the call log and move the Core
 
 ### 4 — Deploy to GCP
-- [ ] Container images for agent and web
-- [ ] CI: ruff, unit tests, `next build` on every PR
-- [ ] Cloud Run: web (scale to zero) and agent worker (min 1 instance, CPU always on)
-- [ ] Secrets in Secret Manager, deploy via Workload Identity Federation
-- [ ] Billing budget alert
-- [ ] Public demo URL works from a phone browser
+- [x] Container images for agent (uv, non-root, models at build) and web (Next standalone)
+- [x] CI: ruff, pytest, eslint, tsc, `next build` and both image builds on every PR
+- [x] Cloud Run manifests: web (scale to zero) and agent worker (min 1 instance, CPU always on, startup probe)
+- [x] Secrets in Secret Manager, per-service runtime accounts, deploy via Workload Identity Federation (`deploy/bootstrap.sh`)
+- [x] Billing budget alert in the bootstrap script
+- [ ] `bootstrap.sh` run on the real project, repository variables set, first deploy green
+- [ ] Public demo URL works from a phone browser; URL and monthly cost in the README
 
 ### 5 — Publish
 - [ ] README: measured numbers, demo video, live link, cost per call

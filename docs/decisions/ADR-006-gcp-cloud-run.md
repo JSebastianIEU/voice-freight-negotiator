@@ -28,4 +28,11 @@ Both run on Cloud Run in one GCP project, deployed by GitHub Actions on push to 
 ## Consequences
 - The always-on worker is the only fixed monthly cost; it is documented in the README.
 - Cloud Run region is chosen close to the LiveKit Cloud region to keep the network part of the
-  latency budget small.
+  latency budget small. Milestone 1 saw a "turn detection transport latency too high" warning
+  from Madrid; the region choice is where that is addressed.
+- The worker must serve an HTTP health endpoint on Cloud Run's `PORT`, which the framework
+  already does (`GET /`); `main.py` passes the port through. Ingress stays internal.
+- Deployment is two Knative manifests (`deploy/cloudrun/`) and one workflow; the manifests are
+  the source of truth for scaling and secrets, so a change there is reviewed like code.
+- Everything an operator needs is in [docs/deploy.md](../deploy.md); the one-time project
+  setup is a re-runnable script (`deploy/bootstrap.sh`), not a list of console clicks.
