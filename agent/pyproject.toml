@@ -6,8 +6,9 @@ license = "MIT"
 authors = [{ name = "Juan Sebastián Peña Donneys" }]
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    # Voice agent framework. Extras: local VAD (silero), local end-of-turn model (turn-detector).
-    "livekit-agents[silero,turn-detector]~=1.8",
+    # Voice agent framework. Extra: local VAD (silero). The end-of-turn model is served by
+    # LiveKit Inference (inference.TurnDetector); the local plugin is deprecated since 1.8.
+    "livekit-agents[silero]~=1.8",
     # Background voice cancellation, free on LiveKit Cloud.
     "livekit-plugins-noise-cancellation~=0.2",
     # Typed settings loaded from the environment / .env.local.

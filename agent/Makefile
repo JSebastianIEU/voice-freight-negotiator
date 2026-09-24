@@ -6,7 +6,7 @@ install:            ## Create the virtualenv and install everything (incl. dev t
 	uv sync
 
 download-files:     ## Fetch local model weights (Silero VAD, turn detector). Run once.
-	uv run main.py download-files
+	uv run -m livekit.agents download-files
 
 console:            ## Talk to the agent from the terminal (no LiveKit room needed)
 	uv run main.py console
