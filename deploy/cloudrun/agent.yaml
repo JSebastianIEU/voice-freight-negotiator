@@ -1,0 +1,67 @@
+# Cloud Run service for the agent worker (Knative serving manifest).
+# Applied by .github/workflows/deploy.yml with __IMAGE__ / __PROJECT_ID__ / __LIVEKIT_URL__
+# filled in. Everything that makes a worker different from a web app is here:
+#
+#   minScale: "1"              the worker waits for jobs over an outbound WebSocket; with
+#                              zero instances nobody answers the phone
+#   cpu-throttling: "false"    CPU stays allocated between requests; a throttled container
+#                              drops its WebSocket and silently stops receiving jobs
+#   maxScale: "1"              one worker handles several calls; one instance keeps the
+#                              demo's fixed cost to one container
+#   startupProbe on GET /      the worker's health endpoint; Cloud Run waits for it
+#                              before routing (and before counting the instance as up)
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: agent
+  annotations:
+    run.googleapis.com/ingress: internal # nothing needs to reach the worker from outside
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "1"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      serviceAccountName: agent-runtime@__PROJECT_ID__.iam.gserviceaccount.com
+      containerConcurrency: 80
+      timeoutSeconds: 3600
+      containers:
+        - image: __IMAGE__
+          ports:
+            - name: http1
+              containerPort: 8080
+          env:
+            - name: LIVEKIT_URL
+              value: __LIVEKIT_URL__
+            - name: LIVEKIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: livekit-api-key
+                  key: latest
+            - name: LIVEKIT_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: livekit-api-secret
+                  key: latest
+            - name: AGENT_PROFILE
+              value: negotiator
+            - name: LOG_LEVEL
+              value: INFO
+            # Container filesystems are ephemeral; per-turn metrics go to stdout logs instead.
+            - name: METRICS_PATH
+              value: /tmp/metrics.jsonl
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 24
