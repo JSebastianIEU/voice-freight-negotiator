@@ -12,7 +12,7 @@ flowchart LR
         direction LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
         STT --> TD["Turn detector<br/>LiveKit model"]
-        TD --> LLM["LLM<br/>DeepSeek chat"]
+        TD --> LLM["LLM<br/>GPT-4.1 mini"]
         LLM <-->|"propose_rate(amount)<br/>accept_rate(amount)"| PG["Price guardian<br/>min/max in code"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]

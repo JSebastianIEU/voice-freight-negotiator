@@ -1,6 +1,6 @@
 # Day-to-day commands. Run from agent/.
 
-.PHONY: install download-files console dev start lint format test test-integration
+.PHONY: install download-files console dev start lint format test test-integration compare-llms
 
 install:            ## Create the virtualenv and install everything (incl. dev tools)
 	uv sync
@@ -30,3 +30,6 @@ test:               ## Offline unit tests only
 
 test-integration:   ## Tests that call real models (needs .env.local)
 	uv run pytest -m integration
+
+compare-llms:       ## Measure LLM time-to-first-token per model through Inference (needs .env.local)
+	uv run scripts/compare_llms.py

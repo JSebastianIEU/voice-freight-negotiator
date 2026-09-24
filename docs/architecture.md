@@ -42,7 +42,7 @@ flowchart LR
         direction LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
         STT --> TD["Turn detector<br/>LiveKit model"]
-        TD --> LLM["LLM<br/>DeepSeek chat"]
+        TD --> LLM["LLM<br/>GPT-4.1 mini"]
         LLM <-->|"propose_rate(amount)<br/>accept_rate(amount)"| PG["Price guardian<br/>min/max in code"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]
@@ -104,7 +104,7 @@ audio in → VAD → STT → turn detection → LLM (+ price guardian tools) →
 | VAD | Silero (runs locally in the worker) | Answers "is someone speaking right now?" every few ms | Cheap; gates the expensive STT stream and powers interruptions |
 | STT | Deepgram Nova-3 via LiveKit Inference | Streams partial transcripts as the carrier speaks | Streaming matters: we do not wait for silence to start transcribing |
 | Turn detection | LiveKit end-of-turn model, served by LiveKit Inference with an on-device fallback | Answers "did the carrier *finish*, or just pause?" from the transcript | See section 5. Negotiations are full of mid-number pauses |
-| LLM | DeepSeek chat (non-reasoning) via LiveKit Inference | Decides *what to say*, calls tools for prices | Small and fast; a reasoning model's "thinking" would be dead air on the call |
+| LLM | GPT-4.1 mini (non-reasoning) via LiveKit Inference | Decides *what to say*, calls tools for prices | Chosen on measured time-to-first-token (ADR-003); a reasoning model's "thinking" would be dead air on the call |
 | Price guardian | Plain Python (`guardian/`) | Validates every amount against a range that lives in code | The LLM can be talked into anything. Code cannot |
 | Output filter | Plain Python | Scans the final text for dollar amounts the guardian did not approve | Defense in depth, see section 7 |
 | TTS | Cartesia Sonic via LiveKit Inference | Text → audio, streamed sentence by sentence | Lowest time-to-first-byte we found; TTS is the biggest cost line |
@@ -117,7 +117,8 @@ what a human would remember.
 
 **LiveKit Inference** means the worker calls STT/LLM/TTS through LiveKit Cloud with a single API
 key. One bill, one spend cap, and swapping the LLM for the test bench is one line
-(`llm="deepseek/..."` → `llm="openai/..."`).
+(`LLM_MODEL=openai/gpt-4.1-mini` → `LLM_MODEL=deepseek-ai/deepseek-v3`). Milestone 1 used
+exactly that to replace the first model choice with a measured one, see ADR-003.
 
 ## 5. VAD vs turn detection
 
@@ -147,7 +148,7 @@ sequenceDiagram
     actor C as Carrier
     participant R as LiveKit Room
     participant S as STT + turn detector
-    participant L as LLM (DeepSeek)
+    participant L as LLM (GPT-4.1 mini)
     participant G as Price guardian (code)
     participant T as TTS
 
