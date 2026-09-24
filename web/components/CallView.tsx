@@ -11,6 +11,7 @@ import { Track } from "livekit-client";
 import { useCallback, useState } from "react";
 
 import { AgentStatus } from "@/components/AgentStatus";
+import { GuardianPanel } from "@/components/GuardianPanel";
 import { Transcript } from "@/components/Transcript";
 import { fetchConnectionDetails } from "@/lib/connection";
 import type { ConnectionDetails } from "@/lib/types";
@@ -96,7 +97,10 @@ export function CallView() {
 
       <AgentStatus />
 
-      <Transcript />
+      <div className="grid gap-6 md:grid-cols-[3fr_2fr]">
+        <Transcript />
+        <GuardianPanel />
+      </div>
 
       <div className="flex items-center justify-center gap-3">
         <TrackToggle
