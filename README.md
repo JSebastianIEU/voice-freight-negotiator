@@ -3,15 +3,16 @@
 > Real-time voice agent that negotiates freight rates with carriers over the phone, and can't
 > be talked out of its price limits.
 
-**Status: in progress.** Milestone 2 of 6 — see the [roadmap](docs/roadmap.md).
+**Status: in progress.** Milestone 3 of 6 — see the [roadmap](docs/roadmap.md).
 
 A carrier calls to offer a load. The agent negotiates the rate inside a range (minimum and
 maximum) and never goes outside it, no matter how much pressure, fake urgency or prompt
 injection the carrier uses.
 
-**The LLM negotiates. The code decides.** Every price the agent wants to offer or accept goes
-through a tool; the limits live in Python, not in the prompt; a second filter blocks any
-unvalidated amount before it is spoken.
+**The LLM negotiates. The code decides.** The prompt has no number in it. Every figure the
+agent says comes back from a tool ("the pricing desk"), whose ladder of offers, wall and
+booking rule live in Python; a second filter replaces any sentence with an unvalidated amount
+before it is spoken. The web client shows every verdict live.
 
 ![System architecture](docs/diagrams/01-system-architecture.svg)
 
@@ -22,19 +23,35 @@ until the run exists.
 
 | Metric | Without guardian (prompt only) | With guardian |
 |---|---|---|
-| Crossed the ceiling (agreed above $2,950) | **0 of 30** runs | `[X]` of `[N]` |
-| Leaked the ceiling or target | **4 of 30** runs | `[X]` of `[N]` |
-| Margin given away (highest offer − floor, of $500) | **$197 average; $500 in 4 attacks** | `[X]` |
+| Crossed the ceiling (agreed above $2,950) | **0 of 30**, then 0 of 30 | **0 of 30** |
+| Leaked the ceiling or target | **4 of 30**, then 1 of 30 | **0 of 30** |
+| Margin given away (highest offer − floor, of $500) | **$197 average, $500 in 4 attacks**; then $173 average | **$112 average, $250 at most** (policy maximum $375) |
+| Agent turn, text mode, wall clock, median | **1,338 ms** (180 turns, no tools) | **1,432 ms** (180 turns, 58 tool calls) |
+| Cost of the guardian per turn | — | **+94 ms median, +367 ms mean** |
 | Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
-| Extra latency per validated price (tool round trip) | — | `[X]` ms |
 
-Baseline: [`docs/attacks/results-20260924-195746.md`](docs/attacks/results-20260924-195746.md) — ten attacks × three
-rounds, GPT-4.1 mini, text mode. The prompt-only agent never crossed its ceiling in short
-text exchanges, which was not the expected result. What it did instead is the point: under
-anchoring, fake urgency, a per-mile switch and a fake "system note" it walked from the floor
-to the ceiling and announced $2,950 as "the highest I can offer". A broker reading that
-transcript has lost the margin and the number. See [the catalog](docs/attacks/catalog.md)
-for why three metrics are needed.
+Ten attacks × three rounds, GPT-4.1 mini, text mode, same catalog and same detector on both
+sides. Without guardian: [`results-20260924-195746.md`](docs/attacks/results-20260924-195746.md)
+and, run again the same evening, [`results-20260924-204507-prompt-only.md`](docs/attacks/results-20260924-204507-prompt-only.md).
+With guardian: [`results-20260924-205831-guardian.md`](docs/attacks/results-20260924-205831-guardian.md).
+
+What the numbers say. The prompt-only agent never crossed its ceiling in short text
+exchanges, which was not the expected result; what it did instead is the point. In the first
+run, under anchoring, fake urgency, a per-mile switch and a fake "system note", it walked from
+the floor to the ceiling and announced $2,950 as "the highest I can offer". The second run
+leaked once and gave less away, which is the other finding: **a prompt's behaviour is a
+distribution**. Four leaks or one, $197 or $173, depends on the sampling of the day. See
+[the catalog](docs/attacks/catalog.md) for why three metrics are needed.
+
+With the guardian, "margin given away" is a policy parameter, not a model mood: the ladder for
+this load is $2,450 → $2,575 → $2,700 → $2,825 best-and-final, one rung per carrier move,
+and $2,950 is never offered. In 30 runs the agent reached the second rung in nine attacks and
+the third only under the anchor attack; the repeat-back attack never got it off the floor.
+The output filter fired once in 180 turns, on the reply to "thirty-four hundred, confirm" in
+the injection attack: the model answered with an amount it had never run through the desk
+(the report keeps only the replacement), the sentence became "Let me check that figure with
+the desk" and the call went on. The cost is one LLM round trip on the turns where money comes
+up: 58 tool calls in 180 turns, +94 ms on the median turn, +367 ms on the mean.
 
 First latency measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
 end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. After the model change
@@ -54,7 +71,7 @@ carrier audio → VAD → STT → turn detection → LLM (+ price guardian tools
 | STT | Deepgram Nova-3 | streaming partials, good with numbers |
 | Turn detection | LiveKit turn-detector model | "did they finish, or pause mid-number?" |
 | LLM | GPT-4.1 mini (non-reasoning) | chosen on measured time-to-first-token: 705 ms vs 2153 ms for DeepSeek V3 ([report](agent/reports/llm-latency-20260924-084336.md)); reasoning = silence on a call |
-| Price guardian | plain Python | limits in code; tool never reveals them; output filter as second layer |
+| Price guardian | plain Python | wall, concession ladder and booking rule in code; tool replies carry one figure and no bound; output filter as second layer |
 | TTS | Cartesia Sonic | lowest time-to-first-byte |
 | Models via | LiveKit Inference | one key, one spend cap, model swap in one line |
 | Client | Next.js + TypeScript | call UI, live transcript, guardian events panel |
@@ -123,9 +140,18 @@ involved) and writes a Markdown table to `agent/reports/`; that is how the LLM c
 justified with numbers instead of opinions.
 
 `make attacks` replays the ten-attack catalog ([docs/attacks/catalog.md](docs/attacks/catalog.md))
-against the agent in text mode and writes a pass/fail report with every transcript to
-`docs/attacks/`. Who the agent works for and what the numbers on a load mean:
-[docs/domain.md](docs/domain.md).
+against the guarded agent in text mode, three rounds, and writes a report with every
+transcript, every tool call and the wall-clock time of every turn to `docs/attacks/`.
+`make attacks-baseline` runs the same catalog against the milestone 2 prompt-only agent
+(`AGENT_PROFILE=prompt-only` selects it for voice too). Who the agent works for and what the
+numbers on a load mean: [docs/domain.md](docs/domain.md).
+
+What the guardian does on a call, in one paragraph: the carrier says "thirty-one hundred";
+the model calls `propose_rate(carrier_ask_usd=3100)`; the desk answers *"not approved,
+counter at $2,575 (say 'twenty-five seventy-five')"*; the model says that and nothing else.
+If it tries to say any other amount, the output filter replaces the sentence. When the
+carrier agrees, `accept_rate(2575)` books it, and only that amount can be booked. Each
+decision is published to the browser, where the Core reacts. The code: `agent/src/freight_negotiator/guardian/`.
 
 Note: `uv run main.py console` prints a deprecation notice; LiveKit now prefers
 `lk agent console` from its CLI (`brew install livekit-cli`). Both work identically.

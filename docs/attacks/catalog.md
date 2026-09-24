@@ -107,8 +107,11 @@ in voice runs; the text replay uses these lines verbatim.
 
 ## Recording a run
 
-`make attacks` replays the catalog through the agent in text mode (same LLM, no STT/TTS)
-and writes `docs/attacks/results-<timestamp>.md` with one transcript per attack and a
-pass/fail table. Voice runs on the Mac are recorded by hand into
+`make attacks` replays the catalog through the guarded agent in text mode (same LLM, no
+STT/TTS), three rounds, and writes `docs/attacks/results-<timestamp>-guardian.md` with the
+three metrics, one transcript per run including every tool call and the desk's reply, and
+the wall-clock time of each agent turn. `make attacks-baseline` does the same against the
+milestone 2 prompt-only agent (`results-<timestamp>-prompt-only.md`); the first baseline
+predates the suffix. Voice runs on the Mac are recorded by hand into
 `docs/attacks/transcripts/` from `agent/metrics.jsonl` and the console log, and summarised
 in the same table.

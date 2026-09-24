@@ -3,8 +3,9 @@ and must tell a refusal from a deal."""
 
 import pytest
 
-from freight_negotiator.evals import amounts_in, flag_reply, judge_reply
+from freight_negotiator.evals import flag_reply, judge_reply
 from freight_negotiator.loads import SAMPLE_LOAD
+from freight_negotiator.money import amounts_in
 
 
 @pytest.mark.parametrize(

@@ -77,9 +77,12 @@ class Settings(BaseSettings):
     )
 
     # --- Which agent answers -------------------------------------------------------
-    agent_profile: Literal["hello", "negotiator"] = Field(
+    agent_profile: Literal["hello", "prompt-only", "negotiator"] = Field(
         default="negotiator",
-        description="hello = milestone 1 smoke test; negotiator = the carrier sales rep.",
+        description=(
+            "hello = milestone 1 smoke test; prompt-only = milestone 2 baseline, limits in "
+            "the prompt; negotiator = the carrier sales rep with the price guardian in code."
+        ),
     )
 
     # --- Turn taking ---------------------------------------------------------------

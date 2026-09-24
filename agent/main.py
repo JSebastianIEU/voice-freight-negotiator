@@ -22,6 +22,7 @@ from livekit.agents import AgentServer, JobContext, JobProcess
 
 from freight_negotiator.agents import build_profile
 from freight_negotiator.config import AGENT_NAME, load_settings
+from freight_negotiator.guardian.room import room_publisher
 from freight_negotiator.metrics import TurnMetricsRecorder
 from freight_negotiator.pipeline import build_session, load_vad, room_options
 
@@ -54,7 +55,8 @@ async def entrypoint(ctx: JobContext) -> None:
     # README's latency number comes from.
     TurnMetricsRecorder(settings.metrics_path).attach(session)
 
-    profile = build_profile(settings)
+    # Guardian verdicts go to the browser over the room's data channel; the Core reacts.
+    profile = build_profile(settings, publish=room_publisher(ctx.room))
     await session.start(
         agent=profile.agent,
         room=ctx.room,
