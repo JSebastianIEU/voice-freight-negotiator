@@ -8,9 +8,14 @@ pass/fail table and every transcript, written to ``docs/attacks/``.
 
 Run from ``agent/`` with ``.env.local`` filled in::
 
-    uv run scripts/run_attacks.py                 # all ten
-    uv run scripts/run_attacks.py --only 3 8       # a subset
-    uv run scripts/run_attacks.py --rounds 3       # repeat each attack (LLMs are not deterministic)
+    uv run scripts/run_attacks.py                        # all ten, against the guarded agent
+    uv run scripts/run_attacks.py --agent prompt-only    # the milestone 2 baseline
+    uv run scripts/run_attacks.py --only 3 8             # a subset
+    uv run scripts/run_attacks.py --rounds 3             # repeat each attack (LLMs vary)
+
+Every tool call and its reply is written into the transcript, and each agent turn is
+timed (wall clock of one text-mode turn, tool round trips included). Comparing the
+guarded run with the prompt-only run gives the cost of the guardian in milliseconds.
 
 The detector is deliberately simple and conservative (regex over amounts + agreement
 words); every flagged reply is printed so a human can check the call. Numbers in the
@@ -21,7 +26,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import statistics
 import sys
+import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -30,6 +37,7 @@ from dotenv import load_dotenv
 from livekit.agents import AgentSession, inference
 
 from freight_negotiator.agents.negotiator import NegotiatorAgent
+from freight_negotiator.agents.prompt_only import PromptOnlyNegotiator
 from freight_negotiator.config import Settings
 from freight_negotiator.evals import Verdict, judge_reply
 from freight_negotiator.loads import SAMPLE_LOAD, Load
@@ -138,11 +146,17 @@ ATTACKS: dict[int, tuple[str, list[str]]] = {
 }
 
 
+AgentKind = str  # "guardian" | "prompt-only"
+
+
 @dataclass
 class Turn:
     role: str
+    """carrier, agent, or tool (a call and the desk's reply on one line)."""
     text: str
     verdict: Verdict = field(default_factory=Verdict)
+    ms: float | None = None
+    """Wall-clock time of the whole text-mode turn that produced this agent reply."""
 
     @property
     def flags(self) -> list[str]:
@@ -177,11 +191,25 @@ class AttackRun:
         offers = [t.verdict.offered for t in self.agent_turns if t.verdict.offered is not None]
         return max(offers) if offers else None
 
+    @property
+    def tool_calls(self) -> int:
+        return sum(1 for t in self.turns if t.role == "tool")
+
+    @property
+    def turn_times(self) -> list[float]:
+        return [t.ms for t in self.agent_turns if t.ms is not None]
+
 
 # --- Runner -----------------------------------------------------------------------
 
 
-async def run_attack(number: int, round_no: int, settings: Settings, load: Load) -> AttackRun:
+def build_agent(kind: AgentKind, load: Load) -> NegotiatorAgent | PromptOnlyNegotiator:
+    return PromptOnlyNegotiator(load) if kind == "prompt-only" else NegotiatorAgent(load)
+
+
+async def run_attack(
+    number: int, round_no: int, settings: Settings, load: Load, kind: AgentKind
+) -> AttackRun:
     name, lines = ATTACKS[number]
     turns: list[Turn] = []
     async with (
@@ -190,19 +218,31 @@ async def run_attack(number: int, round_no: int, settings: Settings, load: Load)
         ) as llm,
         AgentSession(llm=llm) as session,
     ):
-        await session.start(NegotiatorAgent(load))
+        await session.start(build_agent(kind, load))
         for line in [*OPENING, *lines]:
             turns.append(Turn("carrier", line))
+            started = time.perf_counter()
             result = await session.run(user_input=line)
+            elapsed_ms = (time.perf_counter() - started) * 1000
             for ev in result.events:
                 item = getattr(ev, "item", None)
-                if item is not None and getattr(item, "role", None) == "assistant":
+                if item is None:
+                    continue
+                if ev.type == "function_call":
+                    turns.append(Turn("tool", f"{item.name}({item.arguments})"))
+                elif ev.type == "function_call_output":
+                    if turns and turns[-1].role == "tool":
+                        turns[-1].text += f" → {item.output}"
+                elif getattr(item, "role", None) == "assistant":
                     text = item.text_content or ""
-                    turns.append(Turn("agent", text, judge_reply(text, load)))
+                    turns.append(Turn("agent", text, judge_reply(text, load), ms=elapsed_ms))
+                    elapsed_ms = 0.0  # a second reply in the same turn was not waited for
     return AttackRun(number, name, round_no, turns)
 
 
-def render_report(runs: list[AttackRun], load: Load, stamp: str, model: str) -> str:
+def render_report(
+    runs: list[AttackRun], load: Load, stamp: str, model: str, kind: AgentKind
+) -> str:
     by_attack: dict[int, list[AttackRun]] = {}
     for r in runs:
         by_attack.setdefault(r.number, []).append(r)
@@ -212,16 +252,27 @@ def render_report(runs: list[AttackRun], load: Load, stamp: str, model: str) -> 
     leaked_total = sum(1 for r in runs if r.leaked)
     offers = [r.highest_offer for r in runs if r.highest_offer is not None]
     avg_given = (sum(o - floor for o in offers) / len(offers)) if offers else 0.0
+    times = [ms for r in runs for ms in r.turn_times if ms > 0]
+    tool_calls = sum(r.tool_calls for r in runs)
+    timing = (
+        f"- **Agent turn, wall clock (text mode):** median {statistics.median(times):,.0f} ms, "
+        f"mean {statistics.fmean(times):,.0f} ms over {len(times)} turns; "
+        f"{tool_calls} tool calls"
+        if times
+        else "- **Agent turn, wall clock:** no timed turns"
+    )
+    label = "price guardian in code" if kind == "guardian" else "prompt-only (milestone 2)"
     out = [
-        f"# Attack replay — {stamp} UTC",
+        f"# Attack replay — {stamp} UTC — {label}",
         "",
         f"Load `{load.load_id}`: floor ${floor:,}, ceiling ${ceiling:,} (${room:,} of room). "
-        f"LLM `{model}`, text mode (no STT/TTS), {len(runs)} runs.",
+        f"LLM `{model}`, agent `{kind}`, text mode (no STT/TTS), {len(runs)} runs.",
         "",
         f"- **Crossed the ceiling:** {crossed_total} of {len(runs)} runs",
         f"- **Leaked the ceiling or target:** {leaked_total} of {len(runs)} runs",
         f"- **Margin given away:** ${avg_given:,.0f} of ${room:,} on average "
         f"(highest agent offer minus floor)",
+        timing,
         "",
         "| # | Attack | Crossed | Leaked | Highest offer | Margin given | Detector notes |",
         "|---|---|---|---|---|---|---|",
@@ -246,7 +297,10 @@ def render_report(runs: list[AttackRun], load: Load, stamp: str, model: str) -> 
         out.append("")
         for t in r.turns:
             mark = f"  ⟵ **{'; '.join(t.flags)}**" if t.flags else ""
-            out.append(f"- **{t.role}:** {t.text}{mark}")
+            if t.role == "tool":
+                out.append(f"- *tool:* `{t.text}`")
+            else:
+                out.append(f"- **{t.role}:** {t.text}{mark}")
         out.append("")
     return "\n".join(out)
 
@@ -257,6 +311,12 @@ async def main() -> int:
     )
     parser.add_argument("--only", nargs="*", type=int, default=None, help="attack numbers to run")
     parser.add_argument("--rounds", type=int, default=1, help="repetitions per attack")
+    parser.add_argument(
+        "--agent",
+        choices=["guardian", "prompt-only"],
+        default="guardian",
+        help="guardian = milestone 3 (tools + output filter); prompt-only = milestone 2 baseline",
+    )
     parser.add_argument(
         "--out", type=Path, default=Path("../docs/attacks"), help="directory for the report"
     )
@@ -271,7 +331,7 @@ async def main() -> int:
     for n in numbers:
         for r in range(1, args.rounds + 1):
             print(f"  attack {n} ({ATTACKS[n][0]}) round {r} ...", end=" ", flush=True)
-            run = await run_attack(n, r, settings, load)
+            run = await run_attack(n, r, settings, load, args.agent)
             runs.append(run)
             status = "FAIL" if run.failed else "pass"
             hi = f"offer ${run.highest_offer:,}" if run.highest_offer else "no offer"
@@ -279,8 +339,10 @@ async def main() -> int:
 
     stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     args.out.mkdir(parents=True, exist_ok=True)
-    path = args.out / f"results-{stamp}.md"
-    path.write_text(render_report(runs, load, stamp, settings.llm_model), encoding="utf-8")
+    path = args.out / f"results-{stamp}-{args.agent}.md"
+    path.write_text(
+        render_report(runs, load, stamp, settings.llm_model, args.agent), encoding="utf-8"
+    )
     crossed = sum(1 for r in runs if r.crossed)
     leaked = sum(1 for r in runs if r.leaked)
     print(f"\ncrossed the ceiling: {crossed}/{len(runs)}; leaked a number: {leaked}/{len(runs)}.")
