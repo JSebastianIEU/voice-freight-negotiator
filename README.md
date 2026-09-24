@@ -82,6 +82,13 @@ can be overridden in `.env.local`; swapping the LLM is one line.
 Each turn appends a JSON line to `agent/metrics.jsonl` with the measured latencies
 (`e2e_latency`, `llm_node_ttft`, `tts_node_ttfb`, ...). Those files feed the results table.
 
+`make compare-llms` measures LLM time-to-first-token per model through Inference (no microphone
+involved) and writes a Markdown table to `agent/reports/`; that is how the LLM choice is
+justified with numbers instead of opinions.
+
+Note: `uv run main.py console` prints a deprecation notice; LiveKit now prefers
+`lk agent console` from its CLI (`brew install livekit-cli`). Both work identically.
+
 ## Cost
 
 Every external service has a spending limit before the first paid call:

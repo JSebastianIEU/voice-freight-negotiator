@@ -221,3 +221,4 @@ __marimo__/
 .env.local
 agent/metrics.jsonl
 agent/*.jsonl
+agent/reports/*.json
