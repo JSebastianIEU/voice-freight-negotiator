@@ -11,6 +11,7 @@ import { Track } from "livekit-client";
 import { useCallback, useState } from "react";
 
 import { AgentStatus } from "@/components/AgentStatus";
+import { Transcript } from "@/components/Transcript";
 import { fetchConnectionDetails } from "@/lib/connection";
 import type { ConnectionDetails } from "@/lib/types";
 
@@ -94,6 +95,8 @@ export function CallView() {
       <StartAudio label="Click to enable audio" />
 
       <AgentStatus />
+
+      <Transcript />
 
       <div className="flex items-center justify-center gap-3">
         <TrackToggle
