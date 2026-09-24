@@ -15,6 +15,7 @@ is why, in production, it must run as an always-on process (see ADR-006).
 from __future__ import annotations
 
 import logging
+import os
 
 from dotenv import load_dotenv
 from livekit import agents
@@ -41,7 +42,11 @@ def prewarm(proc: JobProcess) -> None:
     proc.userdata["vad"] = load_vad()
 
 
-server = AgentServer(setup_fnc=prewarm)
+# The worker also serves GET / as a health check. Cloud Run tells the container which
+# port to listen on through PORT; locally the framework default applies (8081 in
+# `start`, a random free port in `dev`/`console`).
+_port = int(os.environ["PORT"]) if "PORT" in os.environ else None
+server = AgentServer(setup_fnc=prewarm, **({"port": _port} if _port else {}))
 
 
 @server.rtc_session(agent_name=AGENT_NAME)
