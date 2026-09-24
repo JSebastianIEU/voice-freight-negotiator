@@ -5,7 +5,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 
 | # | Milestone | Branch | Effort | Status |
 |---|---|---|---|---|
-| 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | in progress |
+| 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | in review |
 | 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world` | 1–2 days | planned |
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | planned |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
@@ -19,8 +19,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 ### 0 — Foundations
 - [x] Architecture diagrams (Mermaid + SVG) and explanations
 - [x] Roadmap and article outlines
-- [ ] ADRs for every stack decision
-- [ ] README skeleton with result placeholders (no invented numbers)
+- [x] ADRs for every stack decision
+- [x] README skeleton with result placeholders (no invented numbers)
 
 ### 1 — Voice hello world
 - [ ] `uv run main.py console`: talk to the agent from the terminal
