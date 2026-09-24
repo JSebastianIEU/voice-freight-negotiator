@@ -11,6 +11,7 @@ import logging
 
 from livekit.agents import AgentSession, TurnHandlingOptions, inference, room_io
 from livekit.agents.vad import VAD
+from livekit.agents.voice.turn import EndpointingOptions
 from livekit.plugins import noise_cancellation, silero
 
 from freight_negotiator.config import Settings
@@ -56,6 +57,13 @@ def build_session(settings: Settings, vad: VAD) -> AgentSession:
         tts=_build_tts(settings),
         turn_handling=TurnHandlingOptions(
             turn_detection=inference.TurnDetector(local_fallback=True),
+            # The detector gives a probability that the user finished. Above its threshold
+            # the turn ends after min_delay; below it, the session waits up to max_delay
+            # in case more speech comes. Both are settings so the bench can sweep them.
+            endpointing=EndpointingOptions(
+                min_delay=settings.endpointing_min_delay,
+                max_delay=settings.endpointing_max_delay,
+            ),
         ),
     )
 

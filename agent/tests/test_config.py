@@ -38,6 +38,12 @@ def test_missing_credentials_fail_loudly(monkeypatch: pytest.MonkeyPatch) -> Non
         Settings(_env_file=None)
 
 
+def test_endpointing_defaults_are_faster_than_framework() -> None:
+    s = Settings(**REQUIRED, _env_file=None)
+    assert s.endpointing_min_delay <= s.endpointing_max_delay
+    assert s.endpointing_max_delay < 3.0  # the framework default we measured as too slow
+
+
 def test_temperature_is_bounded() -> None:
     with pytest.raises(ValidationError):
         Settings(**REQUIRED, llm_temperature=3.0, _env_file=None)

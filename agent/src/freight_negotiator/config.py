@@ -66,6 +66,24 @@ class Settings(BaseSettings):
         description="Provider voice id. None lets Inference pick the model's default voice.",
     )
 
+    # --- Turn taking ---------------------------------------------------------------
+    # Measured in milestone 1: when the end-of-turn model was unsure (probability under
+    # its threshold) the session waited the framework default of 3 s before replying.
+    # Good for an assistant that must never cut you off; too slow for a negotiation.
+    endpointing_min_delay: float = Field(
+        default=0.3,
+        ge=0.0,
+        description="Seconds of silence required before the turn can end, even when confident.",
+    )
+    endpointing_max_delay: float = Field(
+        default=1.2,
+        ge=0.0,
+        description=(
+            "Longest wait after silence when the model is unsure the user finished. "
+            "1.2 s still covers a pause mid-number; 3 s (the default) feels broken."
+        ),
+    )
+
     # --- Observability -------------------------------------------------------------
     log_level: str = Field(default="INFO")
     metrics_path: str = Field(
