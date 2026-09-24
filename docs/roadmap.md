@@ -5,8 +5,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 
 | # | Milestone | Branch | Effort | Status |
 |---|---|---|---|---|
-| 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | in review |
-| 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world` | 1–2 days | planned |
+| 0 | Foundations: diagrams, roadmap, ADRs | `docs/foundations` | 2 h | done |
+| 1 | Voice hello world (LiveKit Agents) | `feat/m1-hello-world` | 1–2 days | in review |
 | 1b | Web client (Next.js + TypeScript) | `feat/m1b-web-client` | 1–2 days | planned |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | planned |
 | 3 | Price guardian (tools + output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | planned |
@@ -26,7 +26,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] `uv run main.py console`: talk to the agent from the terminal
 - [ ] `uv run main.py dev` + LiveKit Agents Playground: talk from the browser
 - [ ] Interrupting the agent mid-sentence works
-- [ ] Per-turn latency (end-of-turn → first audio byte) logged as JSONL
+- [x] Per-turn latency (end-of-turn → first audio byte) logged as JSONL
 - [ ] LiveKit Cloud spend cap set and documented
 
 ### 1b — Web client

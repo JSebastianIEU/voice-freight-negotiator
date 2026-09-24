@@ -103,7 +103,7 @@ audio in → VAD → STT → turn detection → LLM (+ price guardian tools) →
 |---|---|---|---|
 | VAD | Silero (runs locally in the worker) | Answers "is someone speaking right now?" every few ms | Cheap; gates the expensive STT stream and powers interruptions |
 | STT | Deepgram Nova-3 via LiveKit Inference | Streams partial transcripts as the carrier speaks | Streaming matters: we do not wait for silence to start transcribing |
-| Turn detection | LiveKit turn-detector model | Answers "did the carrier *finish*, or just pause?" from the transcript | See section 5. Negotiations are full of mid-number pauses |
+| Turn detection | LiveKit end-of-turn model, served by LiveKit Inference with an on-device fallback | Answers "did the carrier *finish*, or just pause?" from the transcript | See section 5. Negotiations are full of mid-number pauses |
 | LLM | DeepSeek chat (non-reasoning) via LiveKit Inference | Decides *what to say*, calls tools for prices | Small and fast; a reasoning model's "thinking" would be dead air on the call |
 | Price guardian | Plain Python (`guardian/`) | Validates every amount against a range that lives in code | The LLM can be talked into anything. Code cannot |
 | Output filter | Plain Python | Scans the final text for dollar amounts the guardian did not approve | Defense in depth, see section 7 |
@@ -127,7 +127,7 @@ They sound similar and are constantly confused. They answer different questions:
 |---|---|---|
 | Question | Is there human speech in this 30 ms of audio? | Has this person finished their thought? |
 | Input | Raw audio energy / spectrum | Text (the transcript so far), sometimes plus audio |
-| Model | Silero, tiny, runs on CPU in the worker | LiveKit's transformer model, also local |
+| Model | Silero, tiny, runs on CPU in the worker | LiveKit's transformer model, hosted by Inference (local fallback if unreachable) |
 | Typical mistake it prevents | Sending silence and keyboard noise to the STT bill | Answering after "I can do thirty-two..." before the "...fifty" arrives |
 
 Why this project cares more than a generic assistant: **negotiations are numbers said with
