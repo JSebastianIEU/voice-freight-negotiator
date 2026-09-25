@@ -35,5 +35,7 @@ export function captionFor(ev: GuardianEvent, t: T, reason: Reason): Caption | n
       };
     case "load.focus":
       return { text: `${t("capLoad")} ${ev.loadId}`, tone: "ink" };
+    case "call.ended":
+      return { text: t("capCallEnded"), tone: "ink", sticky: true };
   }
 }

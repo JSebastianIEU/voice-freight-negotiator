@@ -40,7 +40,7 @@ export function LiveCall({
   onEnd: (events: GuardianEvent[]) => void;
   onError: (message: string) => void;
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [details, setDetails] = useState<ConnectionDetails | null>(null);
   const [feed, setFeed] = useState<CallFeed>(EMPTY_FEED);
   const events = useRef<GuardianEvent[]>([]);
@@ -51,10 +51,11 @@ export function LiveCall({
     // every room dispatches an agent.
     if (started.current) return;
     started.current = true;
-    fetchConnectionDetails(load.id)
+    // The language is fixed when the call starts: it decides which Alex answers.
+    fetchConnectionDetails(load.id, lang)
       .then(setDetails)
       .catch((err: unknown) => onError(err instanceof Error ? err.message : String(err)));
-  }, [load.id, onError]);
+  }, [load.id, lang, onError]);
 
   const onFeed = useCallback((f: CallFeed) => {
     events.current = f.events;

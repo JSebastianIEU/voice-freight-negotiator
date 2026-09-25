@@ -140,8 +140,9 @@ keeps the gap, the trucker, the call, and the wall Alex cannot cross. Then you p
 trucking company and a load and call Alex, who checks your MC number before talking money.
 During the call, the line to say next is always the biggest thing on screen, and tricks
 are one tap away, including two identity tricks. The call ends in a reveal of Alex's secret
-numbers next to what you got. Alex speaks English, and the lines to say stay in English in
-both languages. A 67-second scripted sample plays the same flow without a microphone.
+numbers next to what you got. Alex speaks the page's language, English or Spanish, and hangs
+up itself once the deal is done. A 67-second scripted sample plays the same flow without a
+microphone.
 Design notes: [docs/design/showcase.md](docs/design/showcase.md).
 
 The screen is **the Core**: a sphere of particles that is the agent. It breathes when it

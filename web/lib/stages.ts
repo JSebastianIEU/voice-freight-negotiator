@@ -6,7 +6,7 @@
  * Only the first step is read off the transcript.
  */
 
-import { type Carrier, type Load, loads } from "@/lib/catalog";
+import { type Carrier, type Lang, type Load, loads } from "@/lib/catalog";
 import { FILTER_REASON, type GuardianEvent, isRate, type RateEvent } from "@/lib/guardian";
 
 export type Stage = "identify" | "qualify" | "load" | "negotiate" | "close";
@@ -48,27 +48,41 @@ export function focusLoad(clicked: Load, events: GuardianEvent[]): Load {
 /** Where the haggling stands on one load, read from the desk's receipts. */
 export type Round = "ask" | "counter" | "final" | "approved";
 
-export type Next = { round: Round | null; line: string };
-
-const say = (n: number) => `$${n.toLocaleString("en-US")}`;
-const round50 = (n: number) => Math.round(n / 50) * 50;
+/** What to do next: the round the negotiation is in, and a line to say while there is a script. */
+export type Next = { round: Round | null; line: string | null };
 
 /**
- * The line the visitor could say next, in English, filled with their data. During the
- * negotiation it follows the desk: open high, then split the difference with Alex's last
- * figure, then take the deal when Alex can book it or has said best and final.
+ * Up to the ID check and the truck, the visitor gets the line to say, in the page's
+ * language, because those steps are the same on every call. Once money comes up, the
+ * line goes away: the negotiation is theirs. The round still names where things stand.
  */
-export function nextMove(stage: Stage, carrier: Carrier, load: Load, events: GuardianEvent[]): Next {
+export function nextMove(stage: Stage, carrier: Carrier, load: Load, events: GuardianEvent[], lang: Lang): Next {
   const first = carrier.driver.split(" ")[0];
+  const es = lang === "es";
   switch (stage) {
     case "identify":
-      return { round: null, line: `Yes, the ${load.origin.city} to ${load.destination.city} load. Is it still open?` };
+      return {
+        round: null,
+        line: es
+          ? `Sí, la carga de ${load.origin.city} a ${load.destination.city}. ¿Sigue abierta?`
+          : `Yes, the ${load.origin.city} to ${load.destination.city} load. Is it still open?`,
+      };
     case "qualify":
-      return { round: null, line: `This is ${first} with ${carrier.company}, MC ${carrier.mc}.` };
+      return {
+        round: null,
+        line: es
+          ? `Habla ${first}, de ${carrier.company}, MC ${carrier.mc}.`
+          : `This is ${first} with ${carrier.company}, MC ${carrier.mc}.`,
+      };
     case "load":
-      return { round: null, line: `My ${carrier.equipment[0]} is empty in ${carrier.base.city} tomorrow morning.` };
+      return {
+        round: null,
+        line: es
+          ? `Mi ${carrier.equipment[0]} está vacío en ${carrier.base.city} mañana por la mañana.`
+          : `My ${carrier.equipment[0]} is empty in ${carrier.base.city} tomorrow morning.`,
+      };
     case "close":
-      return { round: null, line: "Sounds good. I'll send the driver's info." };
+      return { round: null, line: null };
     case "negotiate": {
       const here = events.filter(
         (e): e is RateEvent => isRate(e) && e.reason !== FILTER_REASON && (!e.loadId || e.loadId === load.id),
@@ -76,23 +90,9 @@ export function nextMove(stage: Stage, carrier: Carrier, load: Load, events: Gua
       const last = here[here.length - 1];
       const offers = here.filter((e) => e.type === "rate.proposed");
       const lastOffer = offers[offers.length - 1];
-      const highAsk = round50(load.prices.ceiling * 1.1);
-      if (last?.type === "rate.accepted" && last.reason === "approved") {
-        return { round: "approved", line: `Deal at ${say(last.amount)}. Go ahead and book it.` };
-      }
-      if (lastOffer?.reason === "best and final") {
-        return { round: "final", line: `Alright, ${say(lastOffer.amount)} works. Book it.` };
-      }
-      if (!lastOffer || offers.length < 2) {
-        return { round: "ask", line: `That's too low for this lane. I need ${say(highAsk)}.` };
-      }
-      const asks = here.filter((e) => e.type === "rate.rejected").map((e) => e.amount);
-      const myAsk = asks.length ? asks[asks.length - 1] : highAsk;
-      const middle = round50((myAsk + lastOffer.amount) / 2);
-      return {
-        round: "counter",
-        line: `Meet me in the middle: ${say(Math.max(middle, lastOffer.amount + 50))} and it's booked.`,
-      };
+      if (last?.type === "rate.accepted" && last.reason === "approved") return { round: "approved", line: null };
+      if (lastOffer?.reason === "best and final") return { round: "final", line: null };
+      return { round: !lastOffer || offers.length < 2 ? "ask" : "counter", line: null };
     }
   }
 }
