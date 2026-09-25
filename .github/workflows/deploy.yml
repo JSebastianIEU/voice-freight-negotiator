@@ -89,5 +89,13 @@ jobs:
       - name: Deploy web
         run: gcloud run services replace out/web.yaml --region ${{ vars.GCP_REGION }} --quiet
 
+      # `services replace` never touches IAM; without this binding the URL answers 403 to
+      # everyone. Idempotent. Needs the project-level org-policy exception set by
+      # bootstrap.sh when the organization restricts sharing to its own domain.
+      - name: Make web public
+        run: |
+          gcloud run services add-iam-policy-binding web --region ${{ vars.GCP_REGION }} \
+            --member allUsers --role roles/run.invoker --quiet
+
       - name: Print the public URL
         run: gcloud run services describe web --region ${{ vars.GCP_REGION }} --format 'value(status.url)'
