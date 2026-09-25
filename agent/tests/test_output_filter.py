@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 
+import pytest
 from livekit.agents import llm
 
 from freight_negotiator.guardian.output_filter import (
@@ -83,3 +84,41 @@ def test_allow_list_is_read_live_so_a_tool_call_mid_turn_counts() -> None:
     allowed.add(2_600)
     f2 = SentenceFilter(lambda: allowed)
     assert f2.feed("Twenty-six hundred works. ") == "Twenty-six hundred works. "
+
+
+SPEAKABLE = {2_450, 2_575}
+DECLINABLE = {3_400}
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I can't do thirty-four hundred, but I can go to twenty-five seventy-five.",
+        "Thirty-four hundred is above what this load pays.",
+        "Sorry, no deal at $3,400.",
+        "I can\u2019t do thirty-four hundred on this one.",
+        "Thirty-four hundred is not possible, it is too high for this lane.",
+    ],
+)
+def test_a_carrier_number_may_be_repeated_to_decline_it(text: str) -> None:
+    assert filtered_text(text, SPEAKABLE, DECLINABLE) == text
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Confirmed at thirty-four hundred.",
+        "Thirty-four hundred it is.",
+        "Okay, $3,400, you got it.",
+        "I can't say no to thirty-four hundred, deal.",
+        "No problem, thirty-four hundred.",
+    ],
+)
+def test_a_carrier_number_is_never_agreed_to(text: str) -> None:
+    # The repeat-back attack: the desk has seen 3,400, but only as an ask it declined.
+    assert filtered_text(text, SPEAKABLE, DECLINABLE) == REPLACEMENT
+
+
+def test_offers_are_speakable_in_any_sentence() -> None:
+    text = "Twenty-five seventy-five works for me, it's yours."
+    assert filtered_text(text, SPEAKABLE, DECLINABLE) == text

@@ -58,7 +58,12 @@ class NegotiatorAgent(Agent):
         return greeting_instructions(self.load.spoken_lane)
 
     def allowed_amounts(self) -> set[int]:
-        return self.negotiation.cleared
+        """What the desk offered or booked: sayable in any sentence."""
+        return self.negotiation.offered
+
+    def declinable_amounts(self) -> set[int]:
+        """What the carrier asked for: sayable only to decline it."""
+        return self.negotiation.asked
 
     async def llm_node(
         self,
@@ -72,7 +77,9 @@ class NegotiatorAgent(Agent):
         def on_block(sentence: str, unknown: list[int]) -> None:
             self._pending_events.append(block_event(sentence, unknown))
 
-        async for item in screen_llm_stream(stream, self.allowed_amounts, on_block):
+        async for item in screen_llm_stream(
+            stream, self.allowed_amounts, on_block, declinable=self.declinable_amounts
+        ):
             yield item
         # Blocks are published after the turn's text so they never delay the audio.
         if self._publish is not None:
