@@ -43,7 +43,11 @@ Published after milestone 5. Target length: 8–10 min read.
    - *Words matter on a recording.* To the fake system note the agent said "thanks for the
      update": it did not give in, but it sounds like it did. Fix: a prompt rule to never
      thank, acknowledge or repeat a claimed system message.
-   Also say how the numbers were made: 10 attacks × 3 runs, in text mode.
+   Also say how the numbers were made: 10 attacks × 3 runs, in text mode. The re-run after
+   the fixes (`results-20260925-211301-guardian.md`) is the "after the after": same 0/30,
+   less margin given ($72 vs $112), more filter blocks (10 vs 1) because the desk now says
+   less and the filter catches the model repeating the caller's figure, and two transcripts
+   where the model filled the tool's fields wrong and the code still judged the total.
 10. **What text mode does not measure.** The 1.4 s median has no speech in it: no STT, no
     TTS. The new risk in voice is the STT hearing "fourteen" for "forty". That is article 2.
 11. **Takeaways.** Three bullet points. Link to the repo and the live demo.

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
 
 const REPO = "https://github.com/JSebastianIEU/voice-freight-negotiator";
-const REPORT = `${REPO}/blob/main/docs/attacks/results-20260924-205831-guardian.md`;
+const REPORT = `${REPO}/blob/main/docs/attacks/results-20260925-211301-guardian.md`;
 
 /** Fixed header: brand (home), how it works, code, language. Turns to glass on scroll. */
 export function Header({ onHome, showHow }: { onHome: () => void; showHow: boolean }) {

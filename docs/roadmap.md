@@ -94,7 +94,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] The suggested line stops once money comes up; the negotiation is the visitor's
 - [x] Scripted sample call on the same screen, for visitors without a microphone
 - [ ] Real call on the deployed URL through the new flow: verification, greeting names the lane, the reveal matches the transcript
-- [ ] Attack replay re-run against the verified-caller desk; README table updated
+- [x] Attack replay re-run against the current desk (`results-20260925-211301-guardian.md`): 0/30 crossed, 0/30 leaked, $72 of $500 given on average, 10 filter blocks in 180 turns; README table updated
 
 ### 5 — Publish
 - [ ] README: measured numbers, demo video, live link, cost per call
