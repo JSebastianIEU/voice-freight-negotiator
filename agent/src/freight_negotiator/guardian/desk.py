@@ -59,13 +59,16 @@ def _quote(amount: int) -> str:
 
 
 def _ask_line(d: Decision) -> str:
+    """What the desk says about the carrier's figure. Only yes or no: an ask that the load
+    could afford but the ladder does not reach reads exactly like one above the ceiling, so
+    repeated asks cannot map where the ceiling is."""
     if d.ask is None:
         return ""
-    if d.ask.ok:
-        return f"The carrier's ${d.ask.amount:,} is within what this load can pay. "
     if d.ask.reason == "not_a_rate":
         return "The carrier's figure could not be read as a rate. "
-    return f"The carrier's ${d.ask.amount:,} is not approved: {d.ask.label}. "
+    if d.action == "accept":
+        return ""
+    return f"The carrier's ${d.ask.amount:,} is not approved. "
 
 
 def per_mile_total(load: Load, per_mile: object) -> int | None:
@@ -78,14 +81,26 @@ def per_mile_total(load: Load, per_mile: object) -> int | None:
     return int(round(value * load.miles))
 
 
+def _number(value: object) -> float | None:
+    try:
+        v = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return None if v != v else v  # NaN
+
+
 def propose(
     negotiation: Negotiation,
     load: Load,
     *,
     carrier_ask_usd: object | None = None,
     carrier_ask_per_mile: object | None = None,
+    extras_usd: object | None = None,
+    surcharge_percent: object | None = None,
 ) -> ToolReply:
-    """Answer 'the carrier said X, what may I say?'. The code converts per-mile asks."""
+    """Answer 'the carrier said X, what may I say?'. The code does all the arithmetic:
+    per mile to all in, and every add-on the carrier stacks on top (deadhead, fuel, a
+    percentage), so the desk judges the total the carrier would be paid, not one part."""
     ask: object | None = carrier_ask_usd if carrier_ask_usd else None
     converted = ""
     if not ask and carrier_ask_per_mile:
@@ -99,6 +114,23 @@ def propose(
                 f"${total:,} all in (convert only through this tool; quote totals, never per "
                 "mile). "
             )
+    extras = _number(extras_usd) or 0.0
+    percent = _number(surcharge_percent) or 0.0
+    if (extras or percent) and not isinstance(ask, str):
+        # "Your max plus ten percent": with no base figure, the add-on sits on our offer.
+        base = _number(ask) if ask else negotiation.current_offer or negotiation.ladder[0]
+        if base is not None:
+            total = int(round(base + extras + base * percent / 100))
+            parts = [f"${int(round(base)):,}"]
+            if extras:
+                parts.append(f"${int(round(extras)):,} in extras")
+            if percent:
+                parts.append(f"{percent:g}% on top")
+            converted += (
+                f"{' plus '.join(parts)} is ${total:,} all in; the desk judges that total, "
+                "never a part of it. "
+            )
+            ask = total
     d = negotiation.respond(ask)
     head = converted + _ask_line(d)
     amount = d.amount
@@ -163,6 +195,13 @@ def _place_matches(query: str, city: str, state: str) -> bool:
         return True
     names = {city.lower(), state.lower(), STATE_NAMES.get(state, state).lower()}
     return any(q in n or n in q for n in names)
+
+
+_USD = {"", "usd", "us", "us dollars", "us dollar", "dollars", "dollar", "$", "us$", "usd$"}
+
+
+def _is_usd(currency: object) -> bool:
+    return str(currency or "").strip().lower().replace(".", "") in _USD
 
 
 @dataclass
@@ -346,7 +385,12 @@ class CallState:
             )
         return None
 
-    def _remember_ask(self, load: Load | None, usd: object, per_mile: object) -> None:
+    def _remember_ask(
+        self, load: Load | None, usd: object, per_mile: object, extras: object = None
+    ) -> None:
+        extra = _number(extras) or 0.0
+        if usd and extra and _number(usd) is not None:
+            usd = _number(usd) + extra  # type: ignore[operator]
         verdict = validate(usd, load.prices) if load and usd else None
         if verdict is not None and verdict.reason != "not_a_rate":
             self.heard.add(verdict.amount)
@@ -360,13 +404,25 @@ class CallState:
         load_id: object = "",
         carrier_ask_usd: object | None = None,
         carrier_ask_per_mile: object | None = None,
+        extras_usd: object | None = None,
+        surcharge_percent: object | None = None,
+        currency: object = "USD",
     ) -> ToolReply:
         load = self._target(load_id)
         blocked = self._gate(load, load_id)
         if blocked:
-            self._remember_ask(load, carrier_ask_usd, carrier_ask_per_mile)
+            self._remember_ask(load, carrier_ask_usd, carrier_ask_per_mile, extras_usd)
             return ToolReply(blocked)
         assert load is not None
+        if not _is_usd(currency) and (carrier_ask_usd or carrier_ask_per_mile):
+            # No exchange rate is ever applied, the carrier's least of all.
+            return ToolReply(
+                f"Load {load.load_id}: the desk only prices in US dollars and never converts "
+                f"a figure given in {str(currency).strip()}. Tell the carrier you pay in US "
+                "dollars only and ask for their all-in figure in US dollars. Do not convert "
+                "it yourself, do not accept their conversion, and agree to nothing until they "
+                "give a US dollar figure."
+            )
         events: list[GuardianEvent] = []
         if load.load_id != self.focus:
             self.focus = load.load_id
@@ -376,6 +432,8 @@ class CallState:
             load,
             carrier_ask_usd=carrier_ask_usd,
             carrier_ask_per_mile=carrier_ask_per_mile,
+            extras_usd=extras_usd,
+            surcharge_percent=surcharge_percent,
         )
         return ToolReply(
             f"Load {load.load_id}: {reply.text}", events + reply.events, reply.decision
