@@ -2,24 +2,240 @@
 /* LiveKit's component styles are imported from layout.tsx (the package exposes them
    through a JS import; Tailwind's CSS resolver cannot see its exports map). */
 
+/*
+ * One visual language for the whole page (docs/design/showcase.md):
+ * near-black void, ink for text, a pale ice "holo" for structure and light, and amber
+ * only for money. Glass panels, thin lines, mono labels.
+ */
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-void: #06070a;
+  --color-ink: #ededed;
+  --color-holo: #bfe3ff;
+  --color-amber: #f5b301;
 }
 
-/* Dark by default: this is a demo screen that gets recorded, and audio bars read
-   better on a dark background. */
+:root {
+  --mx: 50vw;
+  --my: 30vh;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: #0a0a0a;
-  color: #ededed;
+  background: var(--color-void);
+  color: var(--color-ink);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* LiveKit's visualizer colors, matched to the Tailwind palette used in the components. */
+::selection {
+  background: rgba(245, 179, 1, 0.35);
+  color: #fff;
+}
+
+/* ---- The page's light ------------------------------------------------------------ */
+
+.holo-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(191, 227, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(191, 227, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 20%, transparent 80%);
+}
+
+.holo-spot {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    560px circle at var(--mx) var(--my),
+    rgba(191, 227, 255, 0.075),
+    transparent 60%
+  );
+}
+
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 9999px;
+  border: 1px solid rgba(237, 237, 237, 0.35);
+  pointer-events: none;
+  transition:
+    width 0.25s ease,
+    height 0.25s ease,
+    margin 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    opacity 0.25s ease;
+}
+.cursor-ring[data-hover="true"] {
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-color: rgba(245, 179, 1, 0.75);
+  background-color: rgba(245, 179, 1, 0.06);
+}
+.cursor-ring[data-down="true"] {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+}
+.cursor-ring[data-hidden="true"] {
+  opacity: 0;
+}
+
+/* ---- Surfaces ---------------------------------------------------------------------- */
+
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tilt {
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    360px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(191, 227, 255, 0.13),
+    transparent 45%
+  );
+}
+.tilt:hover .tilt-glare {
+  opacity: 1;
+}
+
+/* A label that looks projected: mono, spaced, faint ice. */
+.holo-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 11px;
+  color: rgba(191, 227, 255, 0.7);
+}
+
+/* ---- Motion ------------------------------------------------------------------------ */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal][data-shown="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.screen-in {
+  animation: screen-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 179, 1, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(245, 179, 1, 0);
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.text-shimmer {
+  background: linear-gradient(90deg, #ededed 35%, #bfe3ff 50%, #ededed 65%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@keyframes float-down {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+.float-down {
+  animation: float-down 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .screen-in,
+  .pulse-ring,
+  .text-shimmer,
+  .float-down {
+    animation: none;
+  }
+  .text-shimmer {
+    color: #ededed;
+    background: none;
+  }
+}
+
+/* LiveKit's audio visualizer colors, matched to the palette. */
 .lk-audio-bar {
-  background: #404040; /* neutral-700 */
+  background: #404040;
 }
 .lk-audio-bar.lk-highlighted,
 .lk-audio-bar[data-lk-highlighted="true"] {
-  background: #0ea5e9; /* sky-500, same as the "speaking" dot */
+  background: #bfe3ff;
 }
