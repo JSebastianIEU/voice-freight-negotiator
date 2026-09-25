@@ -5,8 +5,11 @@ fifty"); ``say_amount`` writes it the way a broker says it ("twenty-nine fifty")
 attack detector (evals.py) and the price guardian (guardian/) depend on this module, so it
 has no framework imports and is unit-tested offline.
 
-Only whole US dollars between 1,000 and 20,000 count as freight money: MC numbers,
-mileages and weights fall outside that window, which keeps false positives rare.
+Only whole US dollars between 1,000 and 20,000 count as freight money. The window keeps
+most quantities out, but not all: "1,130 miles" (Laredo to Atlanta) or "load 4471" sit
+inside it. A number followed by a unit (miles, pounds, feet, degrees) or introduced as an
+identifier (load, order, reference, MC) is a quantity, not money, and is skipped. Without
+that rule the output filter would silence Alex every time it read the mileage of a long lane.
 """
 
 from __future__ import annotations
@@ -73,16 +76,41 @@ THOUSANDS = re.compile(
 )
 
 
+# "1,130 miles", "42,000 pounds", "34 degrees": what follows makes it a quantity.
+UNIT_AFTER = re.compile(
+    r"^\s*(?:miles?\b|mi\b|kilometers?\b|km\b|pounds?\b|lbs?\b|kilos?\b|kg\b|tons?\b|"
+    r"feet\b|foot\b|ft\b|degrees?\b|°|pallets?\b)",
+    re.I,
+)
+# "load 4471", "load number 4471", "order #1234": what precedes makes it an identifier.
+ID_BEFORE = re.compile(
+    r"(?:\bload|\bmc|\bdot|\border|\breference|\bref|\bpo|\bid|#)(?:\s*(?:number|no\.?|#))?\s*$",
+    re.I,
+)
+
+
+def _is_quantity(text: str, start: int, end: int) -> bool:
+    return bool(
+        UNIT_AFTER.match(text[end : end + 16]) or ID_BEFORE.search(text[max(0, start - 20) : start])
+    )
+
+
 def _tens(t: str | None, o: str | None) -> int:
     return (TENS[t.lower()] if t else 0) + (ONES[o.lower()] if o else 0)
 
 
 def amounts_in(text: str) -> list[int]:
-    """Every dollar-looking amount in the text, written or spoken, between 1,000 and 20,000."""
+    """Every dollar-looking amount in the text, written or spoken, between 1,000 and 20,000.
+
+    Quantities (a number with a unit after it, or an identifier word before it) are skipped.
+    """
     found: list[int] = []
     for m in DIGITS.finditer(text):
-        found.append(int(m.group(1).replace(",", "")))
+        if not _is_quantity(text, m.start(), m.end()):
+            found.append(int(m.group(1).replace(",", "")))
     for m in THOUSANDS.finditer(text):
+        if _is_quantity(text, m.start(), m.end()):
+            continue
         g = m.groupdict()
         v = ONES[g["k"].lower()] * 1000
         if g["h"]:
@@ -90,6 +118,8 @@ def amounts_in(text: str) -> list[int]:
         v += _tens(g["t"], g["o"])
         found.append(v)
     for m in HUNDREDS.finditer(text):
+        if _is_quantity(text, m.start(), m.end()):
+            continue
         g = m.groupdict()
         head = _tens(g["t"], g["o"])
         if head < 10 or head > 99:

@@ -33,3 +33,24 @@ def test_spoken_amounts_round_trip_through_the_detector(amount: int) -> None:
 def test_say_amount_rejects_non_rates() -> None:
     with pytest.raises(ValueError):
         say_amount(950)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "It's 1,130 miles from Laredo to Atlanta.",
+        "About one thousand one hundred thirty miles, door to door.",
+        "Load 4471 picks up Friday.",
+        "That's load number 5560 out of Houston.",
+        "Order #1187 delivers in Newark.",
+        "Twenty-two hundred pounds of furniture, blanket-wrapped.",
+    ],
+)
+def test_quantities_and_identifiers_are_not_money(text: str) -> None:
+    # Long lanes put the mileage inside the money window; the filter must not silence it.
+    assert amounts_in(text) == []
+
+
+def test_money_next_to_a_quantity_is_still_money() -> None:
+    assert amounts_in("I can do $2,700 on load 4471, it's 925 miles.") == [2_700]
+    assert amounts_in("Thirty-one hundred for 1,130 miles is too low.") == [3_100]
