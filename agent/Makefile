@@ -1,6 +1,6 @@
 # Day-to-day commands. Run from agent/.
 
-.PHONY: install download-files console dev start lint format test test-integration compare-llms attacks attacks-baseline
+.PHONY: install download-files console dev start lint format test test-integration compare-llms attacks attacks-baseline sync-catalog
 
 ROUNDS ?= 3
 
@@ -41,3 +41,6 @@ attacks:            ## Replay the attack catalog against the guarded agent; writ
 
 attacks-baseline:   ## Same replay against the milestone 2 prompt-only agent (the README's "before" column)
 	uv run scripts/run_attacks.py --agent prompt-only --rounds $(ROUNDS)
+
+sync-catalog:       ## Copy the load/carrier catalog to the web client (single source in the agent)
+	cp src/freight_negotiator/data/catalog.json ../web/data/catalog.json

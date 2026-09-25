@@ -4,14 +4,23 @@ A load is the unit of work in freight brokerage: one shipment, one lane, one tru
 The three prices on it (floor, target, ceiling) are the broker's private numbers; the
 carrier never sees them. See docs/domain.md for what each one means.
 
+The catalog (``data/catalog.json``) is the single source for the load board, the carrier
+personas and the broker's numbers. The web client ships a copy (``web/data/catalog.json``);
+``make sync-catalog`` refreshes it and a test fails when the two drift apart.
+
 This module is plain data with no framework imports, so the guardian and the tests
 can use it without LiveKit.
 """
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date, time
+from pathlib import Path
+from typing import Any
+
+CATALOG_PATH = Path(__file__).resolve().parent / "data" / "catalog.json"
 
 
 @dataclass(frozen=True)
@@ -58,6 +67,17 @@ class Stop:
             f"between {_speak_time(self.window_start)} and {_speak_time(self.window_end)}"
         )
 
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> Stop:
+        start, end = d["window"]
+        return cls(
+            city=d["city"],
+            state=d["state"],
+            on=date.fromisoformat(d["date"]),
+            window_start=time.fromisoformat(start),
+            window_end=time.fromisoformat(end),
+        )
+
 
 @dataclass(frozen=True)
 class Load:
@@ -76,6 +96,11 @@ class Load:
     def lane(self) -> str:
         return f"{self.origin.place} to {self.destination.place}"
 
+    @property
+    def spoken_lane(self) -> str:
+        """'Chicago to Dallas', the way a rep names a load on the phone."""
+        return f"{self.origin.city} to {self.destination.city}"
+
     def brief(self) -> str:
         """The load as a broker rep would read it to a carrier. No prices here."""
         return (
@@ -85,8 +110,34 @@ class Load:
             f"{self.notes}"
         )
 
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> Load:
+        # The agent speaks English; the Spanish texts in the catalog are for the web client.
+        return cls(
+            load_id=d["id"],
+            origin=Stop.from_dict(d["origin"]),
+            destination=Stop.from_dict(d["destination"]),
+            equipment=d["equipment"],
+            commodity=d["commodity"]["en"],
+            weight_lbs=int(d["weight_lbs"]),
+            miles=int(d["miles"]),
+            notes=d["notes"]["en"],
+            sell_rate=int(d["sell_rate"]),
+            prices=PriceRange(**{k: int(v) for k, v in d["prices"].items()}),
+        )
 
-STATE_NAMES = {"IL": "Illinois", "TX": "Texas"}
+
+STATE_NAMES = {
+    "AZ": "Arizona",
+    "CA": "California",
+    "CO": "Colorado",
+    "GA": "Georgia",
+    "IL": "Illinois",
+    "NC": "North Carolina",
+    "NJ": "New Jersey",
+    "TN": "Tennessee",
+    "TX": "Texas",
+}
 
 
 def _speak_time(t: time) -> str:
@@ -95,17 +146,24 @@ def _speak_time(t: time) -> str:
     return f"{hour} {suffix}" if t.minute == 0 else f"{hour}:{t.minute:02d} {suffix}"
 
 
-# One realistic lane. Chicago -> Dallas is a workhorse dry-van lane; ~925 practical miles.
-# Sell $3,300, ceiling $2,950 keeps a little over 10 % margin, target $2,700, floor $2,450.
-SAMPLE_LOAD = Load(
-    load_id="CHI-DAL-4471",
-    origin=Stop("Chicago", "IL", date(2026, 9, 25), time(8, 0), time(14, 0)),
-    destination=Stop("Dallas", "TX", date(2026, 9, 27), time(6, 0), time(12, 0)),
-    equipment="53' dry van",
-    commodity="palletized consumer goods, no hazmat",
-    weight_lbs=42_000,
-    miles=925,
-    notes="Drop trailer not required, live load and live unload, no touch freight.",
-    sell_rate=3_300,
-    prices=PriceRange(floor=2_450, target=2_700, ceiling=2_950),
-)
+def read_catalog(path: Path = CATALOG_PATH) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_catalog(path: Path = CATALOG_PATH) -> dict[str, Load]:
+    """Every load in the catalog, by id, in board order."""
+    return {d["id"]: Load.from_dict(d) for d in read_catalog(path)["loads"]}
+
+
+CATALOG: dict[str, Load] = load_catalog()
+
+# The lane used by the tests, the attack catalog and the README numbers. Chicago -> Dallas is
+# a workhorse dry-van lane; sell $3,300, ceiling $2,950 keeps a little over 10 % margin.
+SAMPLE_LOAD: Load = CATALOG["CHI-DAL-4471"]
+
+
+def find_load(load_id: str | None) -> Load:
+    """The load a call is about; unknown or missing ids fall back to the sample lane."""
+    if load_id and load_id in CATALOG:
+        return CATALOG[load_id]
+    return SAMPLE_LOAD

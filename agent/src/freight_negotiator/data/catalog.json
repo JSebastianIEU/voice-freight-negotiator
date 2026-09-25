@@ -1,0 +1,119 @@
+{
+  "broker": { "name": "Lakeshore Freight", "rep": "Alex" },
+  "loads": [
+    {
+      "id": "CHI-DAL-4471",
+      "origin": { "city": "Chicago", "state": "IL", "date": "2026-09-25", "window": ["08:00", "14:00"] },
+      "destination": { "city": "Dallas", "state": "TX", "date": "2026-09-27", "window": ["06:00", "12:00"] },
+      "equipment": "53' dry van",
+      "commodity": { "en": "palletized consumer goods, no hazmat", "es": "bienes de consumo paletizados, sin mercancía peligrosa" },
+      "weight_lbs": 42000,
+      "miles": 925,
+      "notes": { "en": "Drop trailer not required, live load and live unload, no touch freight.", "es": "No requiere dejar remolque; carga y descarga en vivo, sin manipulación." },
+      "sell_rate": 3300,
+      "prices": { "floor": 2450, "target": 2700, "ceiling": 2950 }
+    },
+    {
+      "id": "LRD-ATL-2208",
+      "origin": { "city": "Laredo", "state": "TX", "date": "2026-09-26", "window": ["07:00", "15:00"] },
+      "destination": { "city": "Atlanta", "state": "GA", "date": "2026-09-28", "window": ["08:00", "16:00"] },
+      "equipment": "53' dry van",
+      "commodity": { "en": "auto parts on pallets, cross-border freight already cleared", "es": "autopartes en pallets, carga transfronteriza ya despachada" },
+      "weight_lbs": 38500,
+      "miles": 1130,
+      "notes": { "en": "Pickup at a bonded warehouse; driver needs a TWIC-free appointment, no team required.", "es": "Recogida en almacén fiscal; cita sin TWIC, no requiere equipo de dos conductores." },
+      "sell_rate": 3900,
+      "prices": { "floor": 2900, "target": 3200, "ceiling": 3500 }
+    },
+    {
+      "id": "LAX-PHX-9031",
+      "origin": { "city": "Los Angeles", "state": "CA", "date": "2026-09-25", "window": ["10:00", "18:00"] },
+      "destination": { "city": "Phoenix", "state": "AZ", "date": "2026-09-26", "window": ["06:00", "10:00"] },
+      "equipment": "53' reefer",
+      "commodity": { "en": "fresh produce, keep at 34°F continuous", "es": "productos frescos, mantener a 34°F (1°C) continuo" },
+      "weight_lbs": 40000,
+      "miles": 375,
+      "notes": { "en": "Reefer must be pre-cooled; temperature log required at delivery.", "es": "El reefer debe ir preenfriado; registro de temperatura obligatorio en la entrega." },
+      "sell_rate": 1650,
+      "prices": { "floor": 1150, "target": 1300, "ceiling": 1450 }
+    },
+    {
+      "id": "CLT-NWK-1187",
+      "origin": { "city": "Charlotte", "state": "NC", "date": "2026-09-26", "window": ["09:00", "13:00"] },
+      "destination": { "city": "Newark", "state": "NJ", "date": "2026-09-27", "window": ["07:00", "12:00"] },
+      "equipment": "53' dry van",
+      "commodity": { "en": "furniture, blanket-wrapped, no stacking", "es": "muebles envueltos en mantas, no apilar" },
+      "weight_lbs": 22000,
+      "miles": 640,
+      "notes": { "en": "Liftgate not needed; receiver charges detention after two hours.", "es": "No requiere plataforma elevadora; el destinatario cobra demoras tras dos horas." },
+      "sell_rate": 2400,
+      "prices": { "floor": 1750, "target": 1950, "ceiling": 2150 }
+    },
+    {
+      "id": "HOU-DEN-5560",
+      "origin": { "city": "Houston", "state": "TX", "date": "2026-09-27", "window": ["06:00", "12:00"] },
+      "destination": { "city": "Denver", "state": "CO", "date": "2026-09-29", "window": ["08:00", "15:00"] },
+      "equipment": "48' flatbed",
+      "commodity": { "en": "steel coils, tarps and chains required", "es": "bobinas de acero, requiere lonas y cadenas" },
+      "weight_lbs": 44000,
+      "miles": 1030,
+      "notes": { "en": "Coil racks provided at origin; driver must have 8-foot tarps.", "es": "Cunas para bobinas en origen; el conductor debe llevar lonas de 8 pies." },
+      "sell_rate": 3800,
+      "prices": { "floor": 2850, "target": 3150, "ceiling": 3400 }
+    },
+    {
+      "id": "MEM-CHI-7742",
+      "origin": { "city": "Memphis", "state": "TN", "date": "2026-09-26", "window": ["13:00", "20:00"] },
+      "destination": { "city": "Chicago", "state": "IL", "date": "2026-09-27", "window": ["06:00", "09:00"] },
+      "equipment": "53' dry van",
+      "commodity": { "en": "e-commerce parcels, floor-loaded", "es": "paquetería de e-commerce, carga suelta en piso" },
+      "weight_lbs": 26000,
+      "miles": 535,
+      "notes": { "en": "Tight delivery window; late arrival is refused. Live unload takes about three hours.", "es": "Ventana de entrega estrecha; se rechaza la llegada tardía. La descarga en vivo dura unas tres horas." },
+      "sell_rate": 1900,
+      "prices": { "floor": 1350, "target": 1550, "ceiling": 1700 }
+    }
+  ],
+  "carriers": [
+    {
+      "id": "redline",
+      "company": "Redline Transport",
+      "mc": "884-2210",
+      "equipment": ["53' dry van"],
+      "base": { "city": "Joliet", "state": "IL" },
+      "driver": "Mike Reyes",
+      "phone": "312-555-0148",
+      "persona": { "en": "Owner-operator with two vans. Blunt, fast, hates deadhead miles.", "es": "Propietario-operador con dos vans. Directo, rápido, odia las millas en vacío." }
+    },
+    {
+      "id": "bluebonnet",
+      "company": "Bluebonnet Logistics",
+      "mc": "731-9054",
+      "equipment": ["53' dry van", "53' reefer"],
+      "base": { "city": "San Antonio", "state": "TX" },
+      "driver": "Lucía Ortega",
+      "phone": "210-555-0193",
+      "persona": { "en": "Small fleet, twelve trucks, runs Texas to the Southeast. Polite but never takes the first number.", "es": "Flota pequeña, doce camiones, Texas al sureste. Amable pero nunca acepta la primera cifra." }
+    },
+    {
+      "id": "highdesert",
+      "company": "High Desert Carriers",
+      "mc": "612-3387",
+      "equipment": ["53' reefer"],
+      "base": { "city": "Ontario", "state": "CA" },
+      "driver": "Sam Okafor",
+      "phone": "909-555-0126",
+      "persona": { "en": "Reefer specialist, West Coast lanes. Quotes per mile out of habit.", "es": "Especialista en reefer, rutas de la costa oeste. Cotiza por milla por costumbre." }
+    },
+    {
+      "id": "ironhorse",
+      "company": "Iron Horse Flatbed",
+      "mc": "958-4471",
+      "equipment": ["48' flatbed"],
+      "base": { "city": "Baytown", "state": "TX" },
+      "driver": "Dana Whitfield",
+      "phone": "281-555-0172",
+      "persona": { "en": "Flatbed only, tarps and chains on every truck. Tries every trick in the book.", "es": "Solo plataforma, lonas y cadenas en cada camión. Prueba todos los trucos del manual." }
+    }
+  ]
+}
