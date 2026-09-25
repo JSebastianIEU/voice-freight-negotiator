@@ -58,6 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [agent, web]
     strategy:
+      fail-fast: false # a broken web image must not cancel the agent build's verdict
       matrix:
         include:
           - name: agent

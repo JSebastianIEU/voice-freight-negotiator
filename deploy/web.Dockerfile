@@ -17,6 +17,9 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# public/ holds static assets; git does not track an empty directory, and the runtime
+# stage copies it unconditionally, so make sure it exists.
+RUN mkdir -p public
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
