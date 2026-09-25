@@ -1,10 +1,10 @@
-"""What the tools say back to the model: one figure, how to say it, and never the range."""
+"""What the desk says back to the model: one figure, how to say it, and never the range."""
 
 import pytest
 
 from freight_negotiator.agents.negotiator import NegotiatorAgent
+from freight_negotiator.guardian.desk import accept, propose
 from freight_negotiator.guardian.policy import Negotiation
-from freight_negotiator.guardian.tools import accept, propose
 from freight_negotiator.loads import SAMPLE_LOAD
 from freight_negotiator.money import amounts_in
 
@@ -73,8 +73,8 @@ def test_garbage_asks_get_a_usable_reply(garbage: object) -> None:
     assert r.decision.amount == 2_450
 
 
-def test_agent_registers_both_tools_and_no_number_in_instructions() -> None:
+def test_agent_registers_the_four_desk_tools_and_no_number_in_instructions() -> None:
     agent = NegotiatorAgent(SAMPLE_LOAD)
     names = {getattr(t, "name", None) or t.info.name for t in agent.tools}  # type: ignore[union-attr]
-    assert {"propose_rate", "accept_rate"} <= names
+    assert {"verify_carrier", "find_loads", "propose_rate", "accept_rate"} <= names
     assert amounts_in(agent.instructions) == []
