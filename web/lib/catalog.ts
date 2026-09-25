@@ -37,6 +37,11 @@ export type Carrier = {
   id: string;
   company: string;
   mc: string;
+  /** "inactive" = operating authority revoked; Alex's directory refuses it. */
+  status: "active" | "inactive";
+  trucks: number;
+  /** Offered as a persona on the page; the others exist only in Alex's directory. */
+  playable: boolean;
   equipment: string[];
   base: { city: string; state: string };
   driver: string;
@@ -54,7 +59,10 @@ const catalog = raw as Catalog;
 
 export const broker = catalog.broker;
 export const loads: Load[] = catalog.loads;
-export const carriers: Carrier[] = catalog.carriers;
+/** Every record in Alex's carrier directory, including ones the visitor cannot pick. */
+export const directory: Carrier[] = catalog.carriers;
+/** The personas the visitor can play. */
+export const carriers: Carrier[] = catalog.carriers.filter((c) => c.playable);
 
 export function findLoad(id: string | null | undefined): Load {
   return loads.find((l) => l.id === id) ?? loads[0];
