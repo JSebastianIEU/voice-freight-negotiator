@@ -76,8 +76,9 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Cloud Run manifests: web (scale to zero) and agent worker (min 1 instance, CPU always on, startup probe)
 - [x] Secrets in Secret Manager, per-service runtime accounts, deploy via Workload Identity Federation (`deploy/bootstrap.sh`)
 - [x] Billing budget alert in the bootstrap script
-- [ ] `bootstrap.sh` run on the real project, repository variables set, first deploy green
-- [ ] Public demo URL works from a phone browser; URL and monthly cost in the README
+- [x] `bootstrap.sh` run on the real project, repository variables set, first deploy green (`deploy` run 1, both services Ready, worker registered)
+- [x] Web service made public (org-policy exception + invoker binding, now in the script and the workflow); URL in the README
+- [ ] Public demo URL verified from a phone browser; monthly cost in the README after the first invoice
 
 ### 5 — Publish
 - [ ] README: measured numbers, demo video, live link, cost per call

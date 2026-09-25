@@ -177,7 +177,8 @@ server. It holds a WebSocket open to LiveKit and waits for jobs, so its Cloud Ru
 pinned to **one always-on instance with CPU always allocated** (`deploy/cloudrun/agent.yaml`).
 The web client scales to zero. Details, cost and troubleshooting: [docs/deploy.md](docs/deploy.md).
 
-Live demo: `[URL after the first deploy]`
+Live demo: https://web-smlbf5fpoa-ew.a.run.app (Cloud Run, `europe-west1`; the worker is
+always on, so the first call needs no warm-up).
 
 ## Cost
 

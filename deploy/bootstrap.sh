@@ -14,6 +14,10 @@
 #   Workload Identity    a pool + GitHub OIDC provider restricted to this repository, so
 #                        GitHub Actions deploys with no stored key
 #   Budget alert         emails at 50 / 90 / 100 % of a monthly amount, before the first deploy
+#   Org-policy exception when the project sits in a Google Workspace organization that
+#                        restricts IAM members to its own domain (iam.allowedPolicyMemberDomains):
+#                        the web service must be invokable by allUsers, so this project
+#                        alone gets allowAll. Takes a couple of minutes to propagate.
 #
 # BUDGET_AMOUNT must be in the billing account's own currency (gcloud billing accounts
 # describe <id> shows currencyCode); the API rejects any other currency with a bare
@@ -99,6 +103,20 @@ for attempt in 1 2 3 4 5 6; do
   [ "$attempt" -eq 6 ] && { echo "could not bind the pool to $DEPLOYER after 6 attempts"; exit 1; }
   echo "  pool not visible to IAM yet, retrying in 10 s ($attempt/6)"; sleep 10
 done
+
+echo "== Org policy: allow allUsers on this project (public web URL)"
+gcloud services enable orgpolicy.googleapis.com --quiet
+if gcloud org-policies describe iam.allowedPolicyMemberDomains --project "$PROJECT_ID" --effective \
+    --format 'value(spec.rules)' 2>/dev/null | grep -q allowedValues; then
+  tmp=$(mktemp)
+  printf 'name: projects/%s/policies/iam.allowedPolicyMemberDomains\nspec:\n  rules:\n    - allowAll: true\n' \
+    "$PROJECT_ID" > "$tmp"
+  gcloud org-policies set-policy "$tmp" >/dev/null
+  rm -f "$tmp"
+  echo "  project-level exception set; the deploy workflow's 'Make web public' step needs ~2 min after this"
+else
+  echo "  no domain restriction in effect, nothing to do"
+fi
 
 echo "== Budget alert: $BUDGET_AMOUNT / month"
 if ! gcloud billing budgets list --billing-account "$BILLING_ACCOUNT" --format 'value(displayName)' | grep -qx "voice-freight-negotiator"; then
