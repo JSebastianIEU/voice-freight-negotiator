@@ -63,8 +63,9 @@ Secret Manager as an environment variable.
   bills CPU-always-allocated instances per second of instance time; the exact monthly figure
   goes in the README once the first invoice exists (no invented numbers).
 - The web service costs nothing when idle.
-- `bootstrap.sh` creates a **billing budget** (default 20 USD / month) with alerts at 50, 90
-  and 100 % before anything is deployed. LiveKit Inference has its own spend cap on the
+- `bootstrap.sh` creates a **billing budget** (default `20USD` / month; set `BUDGET_AMOUNT`
+  in the billing account's own currency, e.g. `80000COP`, or the API rejects it) with alerts
+  at 50, 90 and 100 % before anything is deployed. LiveKit Inference has its own spend cap on the
   LiveKit Cloud side.
 - To stop paying entirely: `gcloud run services delete agent --region <region>`. The web
   service can stay; it scales to zero.

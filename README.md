@@ -185,8 +185,8 @@ Every external service has a spending limit before the first paid call:
 
 - **LiveKit Cloud:** free Build tier for rooms; STT/LLM/TTS billed through LiveKit Inference
   under one spend cap.
-- **GCP:** billing budget alert at 50 / 90 / 100 % of 20 USD a month, created by
-  `deploy/bootstrap.sh` before the first deploy; the only fixed cost is the always-on agent
+- **GCP:** billing budget alert at 50 / 90 / 100 % of about 20 USD a month (80,000 COP on
+  the real account), created by `deploy/bootstrap.sh` before the first deploy; the only fixed cost is the always-on agent
   worker on Cloud Run (1 vCPU, 1 GiB). Monthly figure: `[X]` (from the first invoice).
 
 Measured cost per call: `[X]` (filled by the test bench).

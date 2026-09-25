@@ -14,13 +14,17 @@
 #   Workload Identity    a pool + GitHub OIDC provider restricted to this repository, so
 #                        GitHub Actions deploys with no stored key
 #   Budget alert         emails at 50 / 90 / 100 % of a monthly amount, before the first deploy
+#
+# BUDGET_AMOUNT must be in the billing account's own currency (gcloud billing accounts
+# describe <id> shows currencyCode); the API rejects any other currency with a bare
+# INVALID_ARGUMENT. Default 20USD; e.g. BUDGET_AMOUNT=80000COP for a COP account.
 set -euo pipefail
 
 : "${PROJECT_ID:?set PROJECT_ID}"
 : "${BILLING_ACCOUNT:?set BILLING_ACCOUNT (gcloud billing accounts list)}"
 : "${GITHUB_REPO:?set GITHUB_REPO as owner/name}"
 REGION="${REGION:-europe-west1}"
-BUDGET_USD="${BUDGET_USD:-20}"
+BUDGET_AMOUNT="${BUDGET_AMOUNT:-20USD}"
 
 gcloud config set project "$PROJECT_ID" >/dev/null
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format 'value(projectNumber)')
@@ -83,16 +87,24 @@ gcloud iam workload-identity-pools providers describe github-oidc \
     --issuer-uri "https://token.actions.githubusercontent.com" \
     --attribute-mapping "google.subject=assertion.sub,attribute.repository=assertion.repository" \
     --attribute-condition "assertion.repository == '$GITHUB_REPO'"
-gcloud iam service-accounts add-iam-policy-binding "$DEPLOYER" \
-  --role roles/iam.workloadIdentityUser \
-  --member "principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/attribute.repository/$GITHUB_REPO" \
-  --quiet >/dev/null
+# A pool created seconds ago is not always visible to IAM yet; the binding then fails
+# with a misleading PERMISSION_DENIED. Retry a few times before giving up.
+for attempt in 1 2 3 4 5 6; do
+  if gcloud iam service-accounts add-iam-policy-binding "$DEPLOYER" \
+    --role roles/iam.workloadIdentityUser \
+    --member "principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/attribute.repository/$GITHUB_REPO" \
+    --quiet >/dev/null 2>&1; then
+    break
+  fi
+  [ "$attempt" -eq 6 ] && { echo "could not bind the pool to $DEPLOYER after 6 attempts"; exit 1; }
+  echo "  pool not visible to IAM yet, retrying in 10 s ($attempt/6)"; sleep 10
+done
 
-echo "== Budget alert: $BUDGET_USD USD / month"
+echo "== Budget alert: $BUDGET_AMOUNT / month"
 if ! gcloud billing budgets list --billing-account "$BILLING_ACCOUNT" --format 'value(displayName)' | grep -qx "voice-freight-negotiator"; then
   gcloud billing budgets create --billing-account "$BILLING_ACCOUNT" \
     --display-name "voice-freight-negotiator" \
-    --budget-amount "${BUDGET_USD}USD" \
+    --budget-amount "$BUDGET_AMOUNT" \
     --filter-projects "projects/$PROJECT_NUMBER" \
     --threshold-rule percent=0.5 --threshold-rule percent=0.9 --threshold-rule percent=1.0
 fi
