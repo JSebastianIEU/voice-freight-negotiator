@@ -121,6 +121,13 @@ The browser asks `/api/token` for a short-lived token scoped to one fresh room; 
 carries a dispatch request for the agent named `freight-negotiator`, so the worker running
 `main.py dev` joins that room and only that room. The API secret never leaves the server.
 
+The page is a small game, in English or Spanish: a briefing (you are the carrier, Alex is
+the broker, Alex has a secret ceiling), a load board with six postings and four carrier
+personas to pick from, the attack catalog as "moves" you can read to Alex during the call,
+a step tracker, and a debrief that reveals Alex's numbers next to what you got. Alex speaks
+English; the moves stay in English in both languages. Design notes:
+[docs/design/showcase.md](docs/design/showcase.md).
+
 The screen is **the Core**: a sphere of particles that is the agent. It breathes when it
 listens, spins and tightens when it thinks, sends rings out when it speaks; a blocked price
 blows it open, an accepted one contracts it. http://localhost:3000/demo runs a scripted
