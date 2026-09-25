@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  DisconnectButton,
   LiveKitRoom,
   RoomAudioRenderer,
   StartAudio,
@@ -61,7 +60,20 @@ export function LiveCall({
     events.current = f.events;
     setFeed(f);
   }, []);
-  const hangUp = useCallback(() => onEnd(events.current), [onEnd]);
+  // Hanging up ends the call exactly once. The room reports errors while it tears down
+  // (closed data channels, stopped tracks); after the end they must not reopen setup.
+  const ended = useRef(false);
+  const hangUp = useCallback(() => {
+    if (ended.current) return;
+    ended.current = true;
+    onEnd(events.current);
+  }, [onEnd]);
+  const roomError = useCallback(
+    (err: Error) => {
+      if (!ended.current) onError(err.message);
+    },
+    [onError],
+  );
 
   if (!details) {
     return (
@@ -82,7 +94,7 @@ export function LiveCall({
       audio
       video={false}
       onDisconnected={hangUp}
-      onError={(err) => onError(err.message)}
+      onError={roomError}
     >
       <RoomAudioRenderer />
       <LiveFeed onFeed={onFeed} />
@@ -100,9 +112,15 @@ export function LiveCall({
               source={Track.Source.Microphone}
               className="rounded-full border border-white/15 px-3 py-2 text-xs text-neutral-300 hover:border-white/40"
             />
-            <DisconnectButton className="rounded-full bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition hover:bg-white">
+            {/* Ends the call first and then unmounts the room, which disconnects it, so the
+                result shows up whatever the room reports while closing. */}
+            <button
+              type="button"
+              onClick={hangUp}
+              className="rounded-full bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition hover:bg-white"
+            >
               {t("hangUp")}
-            </DisconnectButton>
+            </button>
           </>
         }
       />

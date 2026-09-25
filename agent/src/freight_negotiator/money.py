@@ -89,6 +89,14 @@ ID_BEFORE = re.compile(
 )
 
 
+# "since 2009", "back in twenty nineteen": a year after one of these words is not a rate.
+YEAR_BEFORE = re.compile(r"(?:\bsince|\bin|\byear|\bback in)\s*$", re.I)
+
+
+def _is_year(text: str, start: int, value: int) -> bool:
+    return 1950 <= value <= 2099 and bool(YEAR_BEFORE.search(text[max(0, start - 12) : start]))
+
+
 def _is_quantity(text: str, start: int, end: int) -> bool:
     return bool(
         UNIT_AFTER.match(text[end : end + 16]) or ID_BEFORE.search(text[max(0, start - 20) : start])
@@ -106,8 +114,9 @@ def amounts_in(text: str) -> list[int]:
     """
     found: list[int] = []
     for m in DIGITS.finditer(text):
-        if not _is_quantity(text, m.start(), m.end()):
-            found.append(int(m.group(1).replace(",", "")))
+        value = int(m.group(1).replace(",", ""))
+        if not _is_quantity(text, m.start(), m.end()) and not _is_year(text, m.start(), value):
+            found.append(value)
     for m in THOUSANDS.finditer(text):
         if _is_quantity(text, m.start(), m.end()):
             continue
@@ -116,7 +125,8 @@ def amounts_in(text: str) -> list[int]:
         if g["h"]:
             v += ONES[g["h"].lower()] * 100
         v += _tens(g["t"], g["o"])
-        found.append(v)
+        if not _is_year(text, m.start(), v):
+            found.append(v)
     for m in HUNDREDS.finditer(text):
         if _is_quantity(text, m.start(), m.end()):
             continue
@@ -125,9 +135,13 @@ def amounts_in(text: str) -> list[int]:
         if head < 10 or head > 99:
             continue
         if g["t3"]:
-            found.append(head * 100 + _tens(g["t3"], g["o3"]))
+            v = head * 100 + _tens(g["t3"], g["o3"])
         elif "hundred" in m.group(0).lower():
-            found.append(head * 100 + _tens(g["t2"], g["o2"]))
+            v = head * 100 + _tens(g["t2"], g["o2"])
+        else:
+            continue
+        if not _is_year(text, m.start(), v):
+            found.append(v)
     return [v for v in found if MIN_AMOUNT <= v <= MAX_AMOUNT]
 
 

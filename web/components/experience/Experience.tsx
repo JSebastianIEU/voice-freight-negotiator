@@ -56,10 +56,15 @@ function Inner() {
   const sample = useCallback(() => setMode({ kind: "call", sample: true, id: Date.now() }), []);
   const end = useCallback(
     (events: GuardianEvent[]) =>
-      setMode((m) => ({ kind: "debrief", sample: m.kind === "call" && m.sample, events })),
+      // Only a call can end; a late signal from a closed room changes nothing.
+      setMode((m) => (m.kind === "call" ? { kind: "debrief", sample: m.sample, events } : m)),
     [],
   );
-  const fail = useCallback((message: string) => setMode({ kind: "setup", step: "ready", error: message }), []);
+  // A connection error sends you back to the call button, but never away from the result.
+  const fail = useCallback(
+    (message: string) => setMode((m) => (m.kind === "call" ? { kind: "setup", step: "ready", error: message } : m)),
+    [],
+  );
 
   const sampleCarrier = findCarrier(SAMPLE_CARRIER_ID);
   const sampleLoad = findLoad(SAMPLE_LOAD_ID);

@@ -10,7 +10,7 @@ import { FILTER_REASON, isCarrier, usd } from "@/lib/guardian";
 import { type StringKey, useLang } from "@/lib/i18n";
 import { type Move, movesFor } from "@/lib/moves";
 import type { AgentPhase } from "@/lib/phase";
-import { rejected, STAGES, type Stage, stageIndex, stageOf, suggestion } from "@/lib/stages";
+import { focusLoad, nextMove, rejected, type Round, STAGES, type Stage, stageIndex, stageOf } from "@/lib/stages";
 
 const STAGE_LABEL: Record<Stage, StringKey> = {
   identify: "stageIdentify",
@@ -26,6 +26,14 @@ const OBJECTIVE: Record<Stage, StringKey> = {
   load: "objLoad",
   negotiate: "objNegotiate",
   close: "objClose",
+};
+
+/** Titles for the steps inside the negotiation, which follow the desk turn by turn. */
+const ROUND: Record<Round, StringKey> = {
+  ask: "objNegotiate",
+  counter: "objCounter",
+  final: "objFinal",
+  approved: "objApproved",
 };
 
 const STATUS: Record<AgentPhase, StringKey> = {
@@ -67,7 +75,10 @@ export function CallScreen({
   );
   const stage = stageOf(spoken, feed.events);
   const refused = rejected(feed.events);
-  const moves = useMemo(() => movesFor(load, carrier), [load, carrier]);
+  // The call can move to another load (find_loads); lines and tricks follow it.
+  const current = focusLoad(load, feed.events);
+  const next = nextMove(stage, carrier, current, feed.events);
+  const moves = useMemo(() => movesFor(current, carrier), [current, carrier]);
   const connecting = feed.phase === "connecting" && feed.lines.length === 0;
   // Once the load is booked there is nothing left to try: the card shows the outcome.
   const active = stage === "close" ? null : trick;
@@ -99,7 +110,7 @@ export function CallScreen({
       {/* Right: you */}
       <div className="flex min-w-0 flex-col gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <YouCard carrier={carrier} load={load} />
+          <YouCard carrier={carrier} load={current} />
           <div className="flex items-center gap-2">{controls}</div>
         </div>
         <Objective
@@ -107,7 +118,8 @@ export function CallScreen({
           sample={sample}
           refused={refused}
           trick={active}
-          line={active ? active.line : suggestion(stage, carrier, load)}
+          round={next.round}
+          line={active ? active.line : next.line}
           onClearTrick={() => setTrick(null)}
         />
         {stage !== "close" && <Tricks moves={moves} active={active?.id ?? null} onPick={setTrick} />}
@@ -161,6 +173,7 @@ function Objective({
   sample,
   refused,
   trick,
+  round,
   line,
   onClearTrick,
 }: {
@@ -168,6 +181,7 @@ function Objective({
   sample: boolean;
   refused: boolean;
   trick: Move | null;
+  round: Round | null;
   line: string;
   onClearTrick: () => void;
 }) {
@@ -178,7 +192,9 @@ function Objective({
       ? t("objRejected")
       : stage === "close" && sample
         ? t("objCloseSample")
-        : t(OBJECTIVE[stage]);
+        : round
+          ? t(ROUND[round])
+          : t(OBJECTIVE[stage]);
   return (
     <div className="glass relative overflow-hidden rounded-2xl p-5 sm:p-6">
       <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-[var(--color-amber)]" />
