@@ -3,7 +3,7 @@
 > Real-time voice agent that negotiates freight rates with carriers over the phone, and can't
 > be talked out of its price limits.
 
-**Status: in progress.** Milestone 3 of 6 — see the [roadmap](docs/roadmap.md).
+**Status: in progress.** Milestone 4 of 6 — see the [roadmap](docs/roadmap.md).
 
 A carrier calls to offer a load. The agent negotiates the rate inside a range (minimum and
 maximum) and never goes outside it, no matter how much pressure, fake urgency or prompt
@@ -86,7 +86,8 @@ Why each choice: [docs/decisions/](docs/decisions/).
 agent/    Python worker: pipeline, agents, price guardian, tests              (milestone 1+)
 web/      Next.js + TypeScript client                                        (milestone 1b+)
 bench/    test bench: fake carrier, scenarios, reports                        (milestone 6)
-deploy/   Dockerfiles and Cloud Run specs                                    (milestone 4)
+deploy/   Dockerfiles, Cloud Run manifests, GCP bootstrap script              (milestone 4)
+.github/  CI on every PR, deploy on push to main                             (milestone 4)
 docs/     architecture, roadmap, ADRs, attack catalog, article outlines
 ```
 
@@ -156,13 +157,37 @@ decision is published to the browser, where the Core reacts. The code: `agent/sr
 Note: `uv run main.py console` prints a deprecation notice; LiveKit now prefers
 `lk agent console` from its CLI (`brew install livekit-cli`). Both work identically.
 
+## Deploy it
+
+Both pieces run on Google Cloud Run, deployed by GitHub Actions on every push to `main`
+([`deploy.yml`](.github/workflows/deploy.yml)); every pull request runs ruff, pytest, eslint,
+`tsc`, `next build` and a build of both images ([`ci.yml`](.github/workflows/ci.yml)).
+
+```bash
+PROJECT_ID=<project> BILLING_ACCOUNT=<id> GITHUB_REPO=JSebastianIEU/voice-freight-negotiator ./deploy/bootstrap.sh
+```
+
+The script enables the APIs, creates the registry, prompts for the two LiveKit secrets into
+Secret Manager, creates the runtime and deployer service accounts, sets up Workload
+Identity Federation for this repository (no JSON key anywhere) and a billing budget alert.
+It prints the five repository variables to set in GitHub; after that, `main` deploys itself.
+
+The one thing to know about running a voice agent on serverless: the worker is not a web
+server. It holds a WebSocket open to LiveKit and waits for jobs, so its Cloud Run service is
+pinned to **one always-on instance with CPU always allocated** (`deploy/cloudrun/agent.yaml`).
+The web client scales to zero. Details, cost and troubleshooting: [docs/deploy.md](docs/deploy.md).
+
+Live demo: `[URL after the first deploy]`
+
 ## Cost
 
 Every external service has a spending limit before the first paid call:
 
 - **LiveKit Cloud:** free Build tier for rooms; STT/LLM/TTS billed through LiveKit Inference
   under one spend cap.
-- **GCP:** billing budget alert; the only fixed cost is the always-on agent worker on Cloud Run.
+- **GCP:** billing budget alert at 50 / 90 / 100 % of about 20 USD a month (80,000 COP on
+  the real account), created by `deploy/bootstrap.sh` before the first deploy; the only fixed cost is the always-on agent
+  worker on Cloud Run (1 vCPU, 1 GiB). Monthly figure: `[X]` (from the first invoice).
 
 Measured cost per call: `[X]` (filled by the test bench).
 

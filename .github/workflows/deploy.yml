@@ -1,0 +1,93 @@
+# Push to main → build both images → Artifact Registry → Cloud Run.
+#
+# Authentication is Workload Identity Federation: GitHub's OIDC token is exchanged for a
+# short-lived Google credential scoped to one service account. No JSON key exists
+# anywhere. The repository condition on the provider (deploy/bootstrap.sh) means only
+# workflows from this repository can use it.
+#
+# Repository configuration (Settings → Secrets and variables → Actions → Variables):
+#   GCP_PROJECT_ID           the project
+#   GCP_REGION               e.g. europe-west1
+#   GCP_WIF_PROVIDER         projects/<number>/locations/global/workloadIdentityPools/github/providers/github-oidc
+#   GCP_DEPLOYER_SA          github-deployer@<project>.iam.gserviceaccount.com
+#   LIVEKIT_URL              wss://<project>.livekit.cloud (not a secret; the key and secret live in Secret Manager)
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # needed to mint the OIDC token for WIF
+
+env:
+  REGISTRY: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/freight
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push agent image
+        uses: docker/build-push-action@v6
+        with:
+          context: agent
+          file: deploy/agent.Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/agent:${{ github.sha }}
+            ${{ env.REGISTRY }}/agent:latest
+          cache-from: type=gha,scope=agent
+          cache-to: type=gha,scope=agent,mode=max
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: web
+          file: deploy/web.Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/web:${{ github.sha }}
+            ${{ env.REGISTRY }}/web:latest
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      # The manifests are the source of truth for how each service runs (min instances,
+      # CPU always on, secrets). The workflow only fills in the image and the project.
+      - name: Render Cloud Run manifests
+        run: |
+          mkdir -p out
+          for svc in agent web; do
+            sed -e "s|__IMAGE__|${REGISTRY}/${svc}:${GITHUB_SHA}|g" \
+                -e "s|__PROJECT_ID__|${{ vars.GCP_PROJECT_ID }}|g" \
+                -e "s|__LIVEKIT_URL__|${{ vars.LIVEKIT_URL }}|g" \
+                deploy/cloudrun/${svc}.yaml > out/${svc}.yaml
+          done
+
+      - name: Deploy agent worker
+        run: gcloud run services replace out/agent.yaml --region ${{ vars.GCP_REGION }} --quiet
+
+      - name: Deploy web
+        run: gcloud run services replace out/web.yaml --region ${{ vars.GCP_REGION }} --quiet
+
+      - name: Print the public URL
+        run: gcloud run services describe web --region ${{ vars.GCP_REGION }} --format 'value(status.url)'
