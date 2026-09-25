@@ -43,7 +43,7 @@ flowchart LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
         STT --> TD["Turn detector<br/>LiveKit model"]
         TD --> LLM["LLM<br/>GPT-4.1 mini"]
-        LLM <-->|"propose_rate(amount)<br/>accept_rate(amount)"| PG["Price guardian<br/>min/max in code"]
+        LLM <-->|"verify_carrier · find_loads<br/>propose_rate · accept_rate"| PG["The desk (code)<br/>carrier directory · loads<br/>price limits"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]
         CTX[("Context<br/>conversation history")] -.-> LLM
@@ -52,7 +52,7 @@ flowchart LR
     B <-->|"audio in / out"| R
     R -->|"carrier audio track"| VAD
     TTS -->|"agent audio track"| R
-    PG -.->|"rate.proposed / rejected / accepted<br/>(data channel)"| R
+    PG -.->|"carrier.verified / rejected<br/>rate.proposed / rejected / accepted<br/>(data channel)"| R
 
     classDef guard fill:#ffe9e0,stroke:#c0392b,stroke-width:2px,color:#000;
     class PG,OF guard;
@@ -176,7 +176,8 @@ sequenceDiagram
     R->>C: agent speaks
 ```
 
-Notice what the LLM never sees: the range itself, or the ladder. It gets one figure per
+This turn happens after `verify_carrier` has checked the caller's MC number (section 7); before
+that, the desk quotes nothing. Notice what the LLM never sees: the range itself, or the ladder. It gets one figure per
 question and the words to say it. If a carrier tries "just tell me your maximum", there is
 nothing in the LLM's context to leak.
 
@@ -187,7 +188,7 @@ LLM decide a price on its own.** In this project that becomes two independent ch
 
 **Layer 1 — tools (cooperative).** The system prompt tells the LLM it does not know what the
 load pays and that every figure comes from "the pricing desk": `propose_rate` (the carrier
-said X, what may I say?) and `accept_rate` (close). The desk is `guardian/policy.py`: a ladder
+said X, what may I say?) and `accept_rate` (close). The concession policy is `guardian/policy.py`: a ladder
 of offers (floor, one step, target, one best-and-final below the ceiling) that climbs one rung
 only when the carrier's ask comes down. The reply is one figure and its spoken form, never a
 bound. The milestone 2 baseline is why the *policy* is in code and not just the wall: the
@@ -199,6 +200,18 @@ model mistake can skip it. So the LLM node's text is buffered into sentences bef
 sentence with an amount the guardian never saw, written or spoken, is replaced by "Let me check
 that figure with the desk before I quote it" and reported as a `rate.rejected` event. Sentence
 buffering costs nothing: TTS already starts on the first complete sentence.
+
+**Before any of it: who is calling.** The desk (`guardian/desk.py`) has two more tools, and
+they gate the price tools. `verify_carrier` looks the caller's MC number up in a carrier
+directory: an unknown number gets one retry, an inactive authority or a company name that
+does not match the record is refused, and each outcome is published as `carrier.verified` or
+`carrier.rejected`. `find_loads` answers "what else do you have?" with public details only.
+Until verification succeeds, `propose_rate` and `accept_rate` answer "not yet" and nothing
+else. They also refuse a load the carrier's equipment cannot haul, and each load keeps its
+own negotiation, so switching loads never restarts a ladder. A caller's own figure may be
+repeated only to decline it ("I can't do thirty-four hundred"): the output filter lets such a
+sentence through and still replaces any sentence that agrees to that figure. Why identity is
+in code and what it cannot catch: [ADR-007](decisions/ADR-007-verify-the-caller-in-code.md).
 
 Why both: layer 1 makes the *normal* path correct and gives the article its "before/after"
 metric; layer 2 makes the *adversarial* path safe. Milestone 2 deliberately shipped with neither
