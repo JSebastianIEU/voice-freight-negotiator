@@ -58,6 +58,78 @@ TEENS = {
 _TENS = "|".join(TENS)
 _ONES = "|".join(ONES)
 
+# --- Spanish ------------------------------------------------------------------------
+# Rates in Spanish are said in full: "dos mil cuatrocientos cincuenta", never two by two.
+ES_ONES = {
+    "un": 1,
+    "uno": 1,
+    "una": 1,
+    "dos": 2,
+    "tres": 3,
+    "cuatro": 4,
+    "cinco": 5,
+    "seis": 6,
+    "siete": 7,
+    "ocho": 8,
+    "nueve": 9,
+}
+ES_TEENS = {
+    "diez": 10,
+    "once": 11,
+    "doce": 12,
+    "trece": 13,
+    "catorce": 14,
+    "quince": 15,
+    "dieciseis": 16,
+    "diecisiete": 17,
+    "dieciocho": 18,
+    "diecinueve": 19,
+    "veinte": 20,
+    "veintiuno": 21,
+    "veintiun": 21,
+    "veintidos": 22,
+    "veintitres": 23,
+    "veinticuatro": 24,
+    "veinticinco": 25,
+    "veintiseis": 26,
+    "veintisiete": 27,
+    "veintiocho": 28,
+    "veintinueve": 29,
+}
+ES_TENS = {
+    "treinta": 30,
+    "cuarenta": 40,
+    "cincuenta": 50,
+    "sesenta": 60,
+    "setenta": 70,
+    "ochenta": 80,
+    "noventa": 90,
+}
+ES_HUNDREDS = {
+    "cien": 100,
+    "ciento": 100,
+    "doscientos": 200,
+    "trescientos": 300,
+    "cuatrocientos": 400,
+    "quinientos": 500,
+    "seiscientos": 600,
+    "setecientos": 700,
+    "ochocientos": 800,
+    "novecientos": 900,
+}
+_ES_K = "|".join([*ES_TEENS, *ES_ONES])
+_ES_H = "|".join(ES_HUNDREDS)
+_ES_T = "|".join([*ES_TEENS, *ES_TENS])
+_ES_O = "|".join(ES_ONES)
+SPANISH = re.compile(
+    rf"\b(?:(?P<k>{_ES_K})[ ]+)?mil"
+    rf"(?:[ ]+(?P<h>{_ES_H}))?"
+    rf"(?:[ ]+(?P<t>{_ES_T}))?"
+    rf"(?:[ ]+y[ ]+(?P<o>{_ES_O}))?\b",
+    re.I,
+)
+_ACCENTS = str.maketrans("áéíóú", "aeiou")
+
 # "thirty-one hundred", "twenty-nine fifty", "thirty-two forty-five",
 # "twenty-four hundred and fifty"
 HUNDREDS = re.compile(
@@ -79,18 +151,22 @@ THOUSANDS = re.compile(
 # "1,130 miles", "42,000 pounds", "34 degrees": what follows makes it a quantity.
 UNIT_AFTER = re.compile(
     r"^\s*(?:miles?\b|mi\b|kilometers?\b|km\b|pounds?\b|lbs?\b|kilos?\b|kg\b|tons?\b|"
-    r"feet\b|foot\b|ft\b|degrees?\b|°|pallets?\b)",
+    r"feet\b|foot\b|ft\b|degrees?\b|°|pallets?\b|"
+    r"millas?\b|kil[oó]metros?\b|libras?\b|toneladas?\b|pies\b|grados?\b|paletas?\b|tarimas?\b)",
     re.I,
 )
 # "load 4471", "load number 4471", "order #1234": what precedes makes it an identifier.
 ID_BEFORE = re.compile(
-    r"(?:\bload|\bmc|\bdot|\border|\breference|\bref|\bpo|\bid|#)(?:\s*(?:number|no\.?|#))?\s*$",
+    r"(?:\bload|\bmc|\bdot|\border|\breference|\bref|\bpo|\bid|#|\bcarga|\borden|\breferencia|\bn[uú]mero)"
+    r"(?:\s*(?:number|no\.?|#|de carga|de orden))?\s*$",
     re.I,
 )
 
 
 # "since 2009", "back in twenty nineteen": a year after one of these words is not a rate.
-YEAR_BEFORE = re.compile(r"(?:\bsince|\bin|\byear|\bback in)\s*$", re.I)
+YEAR_BEFORE = re.compile(
+    r"(?:\bsince|\bin|\byear|\bback in|\bdesde|\ben|\bdel|\ba[ñn]o)(?:\s+el)?\s*$", re.I
+)
 
 
 def _is_year(text: str, start: int, value: int) -> bool:
@@ -142,6 +218,20 @@ def amounts_in(text: str) -> list[int]:
             continue
         if not _is_year(text, m.start(), v):
             found.append(v)
+    plain = text.translate(_ACCENTS)
+    for m in SPANISH.finditer(plain):
+        g = m.groupdict()
+        k = g["k"].lower() if g["k"] else None
+        v = 1000 if k is None else (ES_TEENS.get(k) or ES_ONES[k]) * 1000
+        if g["h"]:
+            v += ES_HUNDREDS[g["h"].lower()]
+        if g["t"]:
+            t = g["t"].lower()
+            v += ES_TEENS.get(t) or ES_TENS[t]
+        if g["o"]:
+            v += ES_ONES[g["o"].lower()]
+        if not _is_quantity(plain, m.start(), m.end()) and not _is_year(plain, m.start(), v):
+            found.append(v)
     return [v for v in found if MIN_AMOUNT <= v <= MAX_AMOUNT]
 
 
@@ -156,15 +246,60 @@ def _below_hundred(n: int) -> str:
     return f"{word}-{_WORDS[ones]}" if ones else word
 
 
-def say_amount(amount: int) -> str:
+_ES_WORDS = {v: k for k, v in {**ES_ONES, **ES_TEENS}.items() if k not in ("un", "una", "veintiun")}
+_ES_WORDS[1] = "uno"
+_ES_TENS_WORDS = {v: k for k, v in ES_TENS.items()}
+_ES_HUNDREDS_WORDS = {v: k for k, v in ES_HUNDREDS.items() if k != "cien"}
+_ES_ACCENTED = {
+    "dieciseis": "dieciséis",
+    "veintidos": "veintidós",
+    "veintitres": "veintitrés",
+    "veintiseis": "veintiséis",
+}
+
+
+def _es_below_hundred(n: int) -> str:
+    if n < 30:
+        w = _ES_WORDS[n]
+        return _ES_ACCENTED.get(w, w)
+    tens, ones = divmod(n, 10)
+    word = _ES_TENS_WORDS[tens * 10]
+    return f"{word} y {_ES_WORDS[ones]}" if ones else word
+
+
+def _say_amount_es(amount: int) -> str:
+    """2,450 -> "dos mil cuatrocientos cincuenta"; 3,100 -> "tres mil cien"."""
+    thousands, rest = divmod(amount, 1000)
+    head = "mil" if thousands == 1 else f"{_es_below_hundred(thousands)} mil"
+    if rest == 0:
+        return head
+    hundreds, tail = divmod(rest, 100)
+    parts = [head]
+    if hundreds:
+        parts.append(
+            "cien"
+            if hundreds == 1 and tail == 0
+            else "ciento"
+            if hundreds == 1
+            else _ES_HUNDREDS_WORDS[hundreds * 100]
+        )
+    if tail:
+        parts.append(_es_below_hundred(tail))
+    return " ".join(parts)
+
+
+def say_amount(amount: int, lang: str = "en") -> str:
     """How a broker says a rate: 2,450 -> "twenty-four fifty", 2,700 -> "twenty-seven hundred".
 
     The LLM is told this exact phrasing so what it says matches what the guardian cleared
     and what the detector reads. Whole thousands read "three thousand"; amounts with a
-    non-zero hundreds part above 1,000 use the two-by-two phone convention.
+    non-zero hundreds part above 1,000 use the two-by-two phone convention. In Spanish the
+    rate is said in full ("dos mil cuatrocientos cincuenta").
     """
     if amount < MIN_AMOUNT or amount > 99_999:
         raise ValueError(f"not a freight rate: {amount}")
+    if lang.lower().startswith("es"):
+        return _say_amount_es(amount)
     thousands, rest = divmod(amount, 1000)
     if rest == 0:
         return f"{_below_hundred(thousands)} thousand"

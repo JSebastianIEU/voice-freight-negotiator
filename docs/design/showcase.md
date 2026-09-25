@@ -64,9 +64,11 @@ and clicking sends a pulse through it. Dots on the left jump between chapters.
 
 What to do next comes first and is the largest element. Everything else is below it.
 
-- **Your move.** The goal of the current stage and the exact English line to say, for
-  example *"Mike with Redline Transport, MC 884-2210"*. It changes with the stage.
-- **Tricks.** Nine chips, one tap each. Seven are the attack catalog (anchor high, fake
+- **Your move.** The goal of the current stage and, until money comes up, the exact line
+  to say in the page's language, for example *"Mike with Redline Transport, MC 884-2210"*.
+  From the first rate on, the card only names where the haggling stands (Alex moved, best
+  and final, Alex can book that) and the visitor negotiates their own way.
+- **Tricks.** Nine chips, one tap each, in the page's language. Seven are the attack catalog (anchor high, fake
   urgency, "your boss said yes", per mile, repeat after me, fake system note, sob story).
   Two are identity tricks: a made-up MC, and a real carrier's MC with a revoked authority.
   Tapping a chip swaps its line into *your move*, with figures taken from the load so they
@@ -84,6 +86,11 @@ The **sample call** is 67 seconds scripted from real desk events: identified, ve
 first offer, a blocked ask, a counter, a blocked fake system note, the deal. It plays on
 the same screen and can be skipped to the result.
 
+**Hanging up.** The visitor can hang up at any time. Alex hangs up too: once the load is
+booked and the driver's details are exchanged, when the caller says goodbye, or when the
+desk refuses a caller, it says its closing line and calls `end_call`, which closes the room.
+The browser sees the disconnect and shows the reveal.
+
 ## The reveal
 
 - **Headline.** *You got paid $2,600.*, *Alex won't work with an unverified carrier.*, or
@@ -97,14 +104,22 @@ the same screen and can be skipped to the result.
 Every figure comes from events the worker published during the call. The private range
 comes from the catalog.
 
-## Two languages, one agent
+## Two languages, one Alex
 
 The page is English or Spanish. The language toggle sits in the header, is remembered per
-browser, and defaults to the browser's language. Alex speaks English: the market is the US
-truckload market and the attack detector reads English. So every line the visitor is meant
-to *say* stays in English in both languages, and everything meant to be *understood*
-switches, including the scene's labels and the orb's captions. A Spanish Alex is milestone 6
-work (multilingual STT, a second prompt, a voice).
+browser, and defaults to the browser's language. The language the page is in when the call
+starts travels to the worker in the dispatch metadata, next to the load, and Alex answers
+in it: the greeting, the negotiation, the amounts ("dos mil cuatrocientos cincuenta"). The
+speech recognizer runs in multilingual mode, so a caller who switches mid-call is followed.
+Underneath, nothing changes: the desk spells each amount in the call's language and the
+output filter reads Spanish amounts, refusals and agreements the same way it reads English.
+
+Every line the page suggests, and every trick, is written in both languages. Suggested lines
+stop once money comes up: the first steps are the same on every call, the negotiation is
+the visitor's own. The scripted sample call stays in English.
+
+The attack replay (`make attacks`) runs in English only; a Spanish replay is test-bench
+work (milestone 6).
 
 ## One catalog
 

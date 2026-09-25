@@ -150,6 +150,10 @@ export class OrbModel {
       case "load.focus":
         this.ping(0.08);
         break;
+      case "call.ended":
+        // The line closes: one last ring, then it settles.
+        this.rings.push({ r: 1, age: 0 });
+        break;
     }
   }
 

@@ -30,7 +30,10 @@ export type CarrierEvent = {
 
 export type FocusEvent = { type: "load.focus"; loadId: string; ts: number };
 
-export type GuardianEvent = RateEvent | CarrierEvent | FocusEvent;
+/** The agent hung up: "booked" | "no deal" | "not verified" | "caller left". */
+export type CallEvent = { type: "call.ended"; reason?: string; ts: number };
+
+export type GuardianEvent = RateEvent | CarrierEvent | FocusEvent | CallEvent;
 
 /** An event before the worker stamps it: any member of the union, minus `ts`. */
 export type EventInput = GuardianEvent extends infer E ? (E extends GuardianEvent ? Omit<E, "ts"> : never) : never;
@@ -75,6 +78,9 @@ export function parseGuardianEvent(payload: Uint8Array): GuardianEvent | null {
     }
     if (o.type === "load.focus" && str(o.loadId)) {
       return { type: "load.focus", loadId: o.loadId as string, ts };
+    }
+    if (o.type === "call.ended") {
+      return { type: "call.ended", reason: str(o.reason), ts };
     }
     return null;
   } catch {

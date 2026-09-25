@@ -23,7 +23,12 @@ from typing import Any
 
 from livekit.agents import Agent, ModelSettings, llm
 
-from freight_negotiator.agents.persona import BROKER_NAME, REP_NAME, greeting_instructions
+from freight_negotiator.agents.persona import (
+    BROKER_NAME,
+    REP_NAME,
+    greeting_instructions,
+    language_name,
+)
 from freight_negotiator.carriers import DIRECTORY, CarrierDirectory
 from freight_negotiator.guardian.desk import CallState
 from freight_negotiator.guardian.events import Publisher
@@ -35,10 +40,30 @@ from freight_negotiator.loads import CATALOG, Load
 PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "negotiator.md"
 
 
-def render_prompt(load: Load, *, broker_name: str = BROKER_NAME, rep_name: str = REP_NAME) -> str:
+LANGUAGE_RULES = {
+    "English": "Speak English, the way a US broker rep does on the phone.",
+    "Spanish": (
+        "The caller chose Spanish: greet and negotiate in natural, short spoken Spanish, "
+        "the way a Latin American dispatcher talks on the phone. Say dollar amounts in full "
+        '("dos mil cuatrocientos cincuenta"), as the desk spells them for you. Load '
+        "numbers, cities and company names stay as they are. Tool arguments are always "
+        "plain numbers."
+    ),
+}
+FOLLOW_THE_CALLER = " If the caller switches language, follow them."
+
+
+def render_prompt(
+    load: Load, *, broker_name: str = BROKER_NAME, rep_name: str = REP_NAME, lang: str = "en"
+) -> str:
     """Persona and the posted load only. Pure, so a test can assert no price is in the text."""
     template = PROMPT_PATH.read_text(encoding="utf-8")
-    return template.format(rep_name=rep_name, broker_name=broker_name, load_brief=load.brief())
+    return template.format(
+        rep_name=rep_name,
+        broker_name=broker_name,
+        load_brief=load.brief(),
+        language_rule=LANGUAGE_RULES[language_name(lang)] + FOLLOW_THE_CALLER,
+    )
 
 
 class NegotiatorAgent(Agent):
@@ -52,20 +77,27 @@ class NegotiatorAgent(Agent):
         loads: Mapping[str, Load] | None = None,
         directory: CarrierDirectory | None = None,
         call: CallState | None = None,
+        lang: str = "en",
     ) -> None:
         self.load = load
+        self.lang = lang
         board = dict(loads if loads is not None else CATALOG)
         board.setdefault(load.load_id, load)
         self.call = call or CallState(
-            posted=load, loads=board, directory=directory if directory is not None else DIRECTORY
+            posted=load,
+            loads=board,
+            directory=directory if directory is not None else DIRECTORY,
+            lang=lang,
         )
         self._publish = publish
         self._pending_events: list[Any] = []
-        super().__init__(instructions=render_prompt(load), tools=guardian_tools(self.call, publish))
+        super().__init__(
+            instructions=render_prompt(load, lang=lang), tools=guardian_tools(self.call, publish)
+        )
 
     @property
     def greeting_instructions(self) -> str:
-        return greeting_instructions(self.load.spoken_lane)
+        return greeting_instructions(self.load.spoken_lane, self.lang)
 
     @property
     def negotiation(self) -> Negotiation:

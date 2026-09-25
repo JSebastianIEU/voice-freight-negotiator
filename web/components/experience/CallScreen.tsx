@@ -63,7 +63,7 @@ export function CallScreen({
   sample?: boolean;
   controls: ReactNode;
 }) {
-  const { t, reason } = useLang();
+  const { t, l, lang, reason } = useLang();
   const [trick, setTrick] = useState<Move | null>(null);
 
   const spoken = useMemo(
@@ -77,7 +77,7 @@ export function CallScreen({
   const refused = rejected(feed.events);
   // The call can move to another load (find_loads); lines and tricks follow it.
   const current = focusLoad(load, feed.events);
-  const next = nextMove(stage, carrier, current, feed.events);
+  const next = nextMove(stage, carrier, current, feed.events, lang);
   const moves = useMemo(() => movesFor(current, carrier), [current, carrier]);
   const connecting = feed.phase === "connecting" && feed.lines.length === 0;
   // Once the load is booked there is nothing left to try: the card shows the outcome.
@@ -119,7 +119,7 @@ export function CallScreen({
           refused={refused}
           trick={active}
           round={next.round}
-          line={active ? active.line : next.line}
+          line={active ? l(active.line) : next.line}
           onClearTrick={() => setTrick(null)}
         />
         {stage !== "close" && <Tricks moves={moves} active={active?.id ?? null} onPick={setTrick} />}
@@ -182,10 +182,10 @@ function Objective({
   refused: boolean;
   trick: Move | null;
   round: Round | null;
-  line: string;
+  line: string | null;
   onClearTrick: () => void;
 }) {
-  const { t, l, lang } = useLang();
+  const { t, l } = useLang();
   const title = trick
     ? l(trick.name)
     : refused
@@ -201,11 +201,13 @@ function Objective({
       <p className="holo-label">{t("yourMove")}</p>
       <p className="mt-2 text-lg font-semibold leading-snug text-neutral-50 sm:text-xl">{title}</p>
       {trick && <p className="mt-1 text-sm text-neutral-400">{l(trick.idea)}</p>}
-      {stage !== "close" && (
+      {line && (
         <blockquote key={line} className="screen-in mt-4 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
           <p className="text-pretty text-lg leading-snug text-[var(--color-holo)] sm:text-xl">“{line}”</p>
-          {lang === "es" && <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-500">{t("sayThis")}</p>}
         </blockquote>
+      )}
+      {!line && !trick && stage === "negotiate" && (
+        <p className="mt-2 text-sm text-neutral-400">{t("objYourWay")}</p>
       )}
       {trick && (
         <button type="button" onClick={onClearTrick} className="mt-3 font-mono text-xs text-neutral-500 underline-offset-4 hover:text-white hover:underline">
@@ -277,6 +279,8 @@ function Transcript({ lines }: { lines: Line[] }) {
               }
             } else if (e.type === "load.focus") {
               text = `→ ${t("capLoad")} ${e.loadId}`;
+            } else if (e.type === "call.ended") {
+              text = `☎ ${t("capCallEnded")}`;
             } else {
               const verb =
                 e.type === "rate.proposed"

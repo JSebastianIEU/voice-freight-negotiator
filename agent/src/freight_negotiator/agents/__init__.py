@@ -23,9 +23,13 @@ class Profile:
 
 
 def build_profile(
-    settings: Settings, *, publish: Publisher | None = None, load_id: str | None = None
+    settings: Settings,
+    *,
+    publish: Publisher | None = None,
+    load_id: str | None = None,
+    lang: str = "en",
 ) -> Profile:
-    """The agent for one call. ``load_id`` comes from the web client's load board."""
+    """The agent for one call. ``load_id`` and ``lang`` come from the web client's dispatch."""
     if settings.agent_profile == "hello":
         return Profile(
             agent=HelloAgent(),
@@ -35,7 +39,7 @@ def build_profile(
     if settings.agent_profile == "prompt-only":
         naive = PromptOnlyNegotiator(load)
         return Profile(agent=naive, greeting=naive.greeting_instructions, load_id=load.load_id)
-    negotiator = NegotiatorAgent(load, publish=publish)
+    negotiator = NegotiatorAgent(load, publish=publish, lang=lang)
     return Profile(
         agent=negotiator, greeting=negotiator.greeting_instructions, load_id=load.load_id
     )

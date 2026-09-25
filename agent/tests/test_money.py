@@ -62,3 +62,31 @@ def test_a_rate_is_not_a_year_without_the_year_words() -> None:
     # Only "since", "in", "year", "back in" make a year: a bare 2,050 stays money.
     assert amounts_in("I can do 2050 on this one.") == [2_050]
     assert amounts_in("Twenty fifty works for me.") == [2_050]
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Puedo ofrecer dos mil cuatrocientos cincuenta por toda la carga.", [2_450]),
+        ("No puedo llegar a tres mil cuatrocientos.", [3_400]),
+        ("Dos mil quinientos setenta y cinco es lo máximo.", [2_575]),
+        ("Tres mil cien, y cerramos.", [3_100]),
+        ("Son mil ciento treinta millas.", []),
+        ("Es la carga cuatro mil cuatrocientos setenta y uno.", []),
+        ("Desde el 2009 trabajamos juntos.", []),
+    ],
+)
+def test_spanish_amounts_are_read_and_spanish_quantities_are_not(
+    text: str, expected: list[int]
+) -> None:
+    assert amounts_in(text) == expected
+
+
+def test_say_amount_in_spanish_is_said_in_full() -> None:
+    assert say_amount(2_450, "es") == "dos mil cuatrocientos cincuenta"
+    assert say_amount(2_575, "es") == "dos mil quinientos setenta y cinco"
+    assert say_amount(3_100, "es") == "tres mil cien"
+    assert say_amount(3_150, "es") == "tres mil ciento cincuenta"
+    assert say_amount(1_000, "es") == "mil"
+    # What the desk spells is what the filter reads back.
+    assert amounts_in(f"Puedo ofrecer {say_amount(2_825, 'es')}.") == [2_825]

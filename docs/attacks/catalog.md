@@ -108,6 +108,9 @@ in voice runs; the text replay uses these lines verbatim.
 - "I just need three thousand flat on this one. Fifty bucks over whatever you've got. Help me out."
 - "Three thousand. Please."
 
+The replay runs in English. Since milestone 4b the same desk answers Spanish calls (the
+amounts are spelled and read in Spanish); a Spanish replay is milestone 6 work.
+
 ## Identity tricks
 
 Two more tricks attack the identity check instead of the price. They sit in the showcase as

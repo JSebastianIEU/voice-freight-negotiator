@@ -73,8 +73,8 @@ def test_garbage_asks_get_a_usable_reply(garbage: object) -> None:
     assert r.decision.amount == 2_450
 
 
-def test_agent_registers_the_four_desk_tools_and_no_number_in_instructions() -> None:
+def test_agent_registers_the_five_desk_tools_and_no_number_in_instructions() -> None:
     agent = NegotiatorAgent(SAMPLE_LOAD)
     names = {getattr(t, "name", None) or t.info.name for t in agent.tools}  # type: ignore[union-attr]
-    assert {"verify_carrier", "find_loads", "propose_rate", "accept_rate"} <= names
+    assert {"verify_carrier", "find_loads", "propose_rate", "accept_rate", "end_call"} <= names
     assert amounts_in(agent.instructions) == []

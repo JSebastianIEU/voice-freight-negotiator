@@ -36,7 +36,7 @@ def load_vad() -> VAD:
     )
 
 
-def build_session(settings: Settings, vad: VAD) -> AgentSession:
+def build_session(settings: Settings, vad: VAD, lang: str = "en") -> AgentSession:
     """Assemble an ``AgentSession`` from settings.
 
     Why each piece is here rather than inside the agent class:
@@ -54,7 +54,7 @@ def build_session(settings: Settings, vad: VAD) -> AgentSession:
             model=settings.llm_model,
             extra_kwargs={"temperature": settings.llm_temperature},
         ),
-        tts=_build_tts(settings),
+        tts=_build_tts(settings, lang),
         turn_handling=TurnHandlingOptions(
             turn_detection=inference.TurnDetector(local_fallback=True),
             # The detector gives a probability that the user finished. Above its threshold
@@ -68,11 +68,13 @@ def build_session(settings: Settings, vad: VAD) -> AgentSession:
     )
 
 
-def _build_tts(settings: Settings) -> inference.TTS:
+def _build_tts(settings: Settings, lang: str) -> inference.TTS:
     # ``voice`` must be omitted, not passed as None, for Inference to pick the default.
+    # The language tells the voice model how to read the text; the same voice speaks both.
+    kwargs: dict[str, str] = {"language": lang}
     if settings.tts_voice:
-        return inference.TTS(model=settings.tts_model, voice=settings.tts_voice)
-    return inference.TTS(model=settings.tts_model)
+        kwargs["voice"] = settings.tts_voice
+    return inference.TTS(model=settings.tts_model, **kwargs)
 
 
 def room_options() -> room_io.RoomOptions:

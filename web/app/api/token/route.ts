@@ -15,8 +15,9 @@
  * the two must never land in the same room by accident.
  *
  * The dispatch metadata tells the worker which posting the carrier is calling about
- * ({ loadId }), exactly like a load-board click. Nothing about the carrier goes in
- * it: the agent asks for company and MC number the way a rep does.
+ * ({ loadId }), exactly like a load-board click, and which language the page was in
+ * ({ lang }), so Alex answers in it. Nothing about the carrier goes in it: the agent asks
+ * for company and MC number the way a rep does.
  */
 
 import { RoomAgentDispatch, RoomConfiguration } from "@livekit/protocol";
@@ -51,13 +52,15 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   // The load must be one we post; anything else falls back to the first on the board.
   let loadId = loads[0].id;
+  let lang: "en" | "es" = "en";
   try {
-    const body = (await req.json()) as { loadId?: unknown };
+    const body = (await req.json()) as { loadId?: unknown; lang?: unknown };
     if (typeof body.loadId === "string" && loads.some((l) => l.id === body.loadId)) {
       loadId = body.loadId;
     }
+    if (body.lang === "es") lang = "es";
   } catch {
-    // no body or not JSON: default load
+    // no body or not JSON: default load, English
   }
 
   // A fresh room per call keeps conversations isolated from each other.
@@ -78,7 +81,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     canPublishData: true, // reserved for text input later
   });
   token.roomConfig = new RoomConfiguration({
-    agents: [new RoomAgentDispatch({ agentName, metadata: JSON.stringify({ loadId }) })],
+    agents: [new RoomAgentDispatch({ agentName, metadata: JSON.stringify({ loadId, lang }) })],
   });
 
   const details: ConnectionDetails = {

@@ -1,4 +1,4 @@
-"""The four functions the LLM may call, as LiveKit tools bound to one call.
+"""The five functions the LLM may call, as LiveKit tools bound to one call.
 
 The answers come from ``desk.py`` (pure, unit-tested); this module only wraps them for the
 framework, logs what the desk decided and publishes the events to the room so the web
@@ -8,12 +8,14 @@ each tool, so they say *when*, not *how*.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 
-from livekit.agents import RunContext, function_tool, llm
+from livekit import api
+from livekit.agents import RunContext, function_tool, get_job_context, llm
 
 from freight_negotiator.guardian.desk import CallState, ToolReply
-from freight_negotiator.guardian.events import Publisher
+from freight_negotiator.guardian.events import Publisher, call_ended_event
 
 logger = logging.getLogger(__name__)
 
@@ -96,4 +98,23 @@ def guardian_tools(call: CallState, publish: Publisher | None) -> list[llm.Tool]
         """
         return await emit("accept_rate", call.accept(amount_usd, load_id))
 
-    return [verify_carrier, find_loads, propose_rate, accept_rate]
+    @function_tool()
+    async def end_call(context: RunContext, reason: str = "done") -> str:
+        """Hang up. Call it only after your closing line, once the caller has nothing else:
+        when the load is booked and the details are exchanged, when the caller says goodbye
+        or wants to hang up, when the desk told you to end the call, or when there is no
+        deal. reason is one of: booked, no deal, not verified, caller left.
+        """
+        logger.info("desk end_call -> %s", reason)
+        if publish is not None:
+            await publish(call_ended_event(reason))
+        # Let the goodbye finish playing, then close the room; the browser sees the
+        # disconnect and shows the result.
+        with contextlib.suppress(Exception):  # nothing to wait for in text mode
+            await context.speech_handle.wait_for_playout()
+        job = get_job_context(required=False)
+        if job is not None:
+            await job.api.room.delete_room(api.DeleteRoomRequest(room=job.room.name))
+        return "The call is over. Say nothing more."
+
+    return [verify_carrier, find_loads, propose_rate, accept_rate, end_call]

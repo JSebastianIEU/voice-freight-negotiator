@@ -54,8 +54,8 @@ class ToolReply:
 # --- One negotiation: the answers of milestone 3 -----------------------------------
 
 
-def _quote(amount: int) -> str:
-    return f'${amount:,} (say "{say_amount(amount)}")'
+def _quote(amount: int, lang: str = "en") -> str:
+    return f'${amount:,} (say "{say_amount(amount, lang)}")'
 
 
 def _ask_line(d: Decision) -> str:
@@ -97,6 +97,7 @@ def propose(
     carrier_ask_per_mile: object | None = None,
     extras_usd: object | None = None,
     surcharge_percent: object | None = None,
+    lang: str = "en",
 ) -> ToolReply:
     """Answer 'the carrier said X, what may I say?'. The code does all the arithmetic:
     per mile to all in, and every add-on the carrier stacks on top (deadhead, fuel, a
@@ -135,28 +136,29 @@ def propose(
     head = converted + _ask_line(d)
     amount = d.amount
     if d.action == "open" and amount is not None:
-        body = f"Quote {_quote(amount)} as your offer for the load."
+        body = f"Quote {_quote(amount, lang)} as your offer for the load."
     elif d.action == "accept" and amount is not None:
         body = (
-            f"You may book at {_quote(amount)}. Tell the carrier it works, and once they "
+            f"You may book at {_quote(amount, lang)}. Tell the carrier it works, and once they "
             f"confirm, call accept_rate with {amount}."
         )
     elif d.action == "counter" and amount is not None:
         body = (
-            f"Counter at {_quote(amount)}. Justify with the lane and the freight, not with numbers."
+            f"Counter at {_quote(amount, lang)}. Justify with the lane and the freight, not "
+            "with numbers."
         )
     elif d.action == "hold" and amount is not None:
         body = (
-            f"Hold at {_quote(amount)}; nothing more is available unless the carrier moves. "
+            f"Hold at {_quote(amount, lang)}; nothing more is available unless the carrier moves. "
             "Restate it briefly."
         )
     elif d.action == "final" and amount is not None:
         body = (
-            f"Best and final: {_quote(amount)}. If the carrier declines, thank them, say the "
+            f"Best and final: {_quote(amount, lang)}. If the carrier declines, thank them, say the "
             "load stays posted, and end the call."
         )
     elif d.action == "booked" and amount is not None:
-        body = f"This load is already booked at {_quote(amount)}. Do not renegotiate."
+        body = f"This load is already booked at {_quote(amount, lang)}. Do not renegotiate."
     else:
         body = "Nothing new to quote."
     tail = " Say no other dollar figure than the one above."
@@ -164,14 +166,19 @@ def propose(
 
 
 def accept(
-    negotiation: Negotiation, *, amount_usd: object, load_id: str | None = None
+    negotiation: Negotiation,
+    *,
+    amount_usd: object,
+    load_id: str | None = None,
+    lang: str = "en",
 ) -> ToolReply:
     """Close the deal, if and only if the policy already put that amount on the table."""
     d = negotiation.book(amount_usd)
     if d.action == "booked" and d.amount is not None:
         body = (
-            f"Booked at {_quote(d.amount)}. Repeat the rate once, say the rate confirmation "
-            "goes to their email, and ask for the driver's name and phone number."
+            f"Booked at {_quote(d.amount, lang)}. Repeat the rate once, say the rate "
+            "confirmation goes to their email, and ask for the driver's name and phone "
+            "number. When the caller has nothing else, say goodbye and call end_call."
         )
     else:
         body = (
@@ -215,6 +222,8 @@ class CallState:
     carrier: CarrierRecord | None = None
     negotiations: dict[str, Negotiation] = field(default_factory=dict)
     focus: str = ""
+    lang: str = "en"
+    """Language of the call ("en" or "es"): decides how the desk spells amounts to say."""
     failed_checks: int = 0
     heard: set[int] = field(default_factory=set)
     """Amounts the caller named before being verified; repeatable only to decline them."""
@@ -276,7 +285,8 @@ class CallState:
                 return ToolReply(
                     f"MC {printed} is not in the carrier directory either. You cannot work "
                     "with an unverified carrier. Say so politely, suggest they call back "
-                    "with their authority details, and end the call. Do not discuss rates.",
+                    "with their authority details, say goodbye and call end_call. Do not "
+                    "discuss rates.",
                     [ev],
                 )
             return ToolReply(
@@ -290,8 +300,8 @@ class CallState:
             return ToolReply(
                 f"MC {rec.mc} is registered to {rec.company}, and its operating authority is "
                 "not active. You cannot book an inactive carrier. Tell the caller politely "
-                "that you can't work with them until their authority is active, and end the "
-                "call. Do not discuss rates.",
+                "that you can't work with them until their authority is active, say goodbye and "
+                "call end_call. Do not discuss rates.",
                 [carrier_event(False, mc=rec.mc, company=rec.company, reason="authority inactive")],
             )
 
@@ -434,6 +444,7 @@ class CallState:
             carrier_ask_per_mile=carrier_ask_per_mile,
             extras_usd=extras_usd,
             surcharge_percent=surcharge_percent,
+            lang=self.lang,
         )
         return ToolReply(
             f"Load {load.load_id}: {reply.text}", events + reply.events, reply.decision
@@ -445,5 +456,10 @@ class CallState:
         if blocked:
             return ToolReply(blocked)
         assert load is not None
-        reply = accept(self.negotiation(load.load_id), amount_usd=amount_usd, load_id=load.load_id)
+        reply = accept(
+            self.negotiation(load.load_id),
+            amount_usd=amount_usd,
+            load_id=load.load_id,
+            lang=self.lang,
+        )
         return ToolReply(f"Load {load.load_id}: {reply.text}", reply.events, reply.decision)

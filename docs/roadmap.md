@@ -89,7 +89,9 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] First version (briefing, load board, persona cards, moves, debrief) shipped and reviewed: too much text in one place, no obvious next click
 - [x] Redesign: hero with one button; holographic explainer of shipper, broker and carrier in six scrolled chapters; two-step setup; a call screen led by the next line to say; tricks as chips, two of them identity tricks; the reveal on a price line
 - [x] Pointer interactions: light, cursor ring, tilt, magnetic buttons, hover and click on the scene; touch screens and reduced motion handled
-- [x] English / Spanish interface; Alex stays in English (Spanish Alex is milestone 6)
+- [x] English / Spanish interface, and a Spanish Alex: the page's language travels in the dispatch, the STT runs multilingual, the desk spells amounts in the call's language and the output filter reads Spanish
+- [x] Alex hangs up itself (`end_call`) after the deal, a goodbye or a refusal; the browser goes to the reveal
+- [x] The suggested line stops once money comes up; the negotiation is the visitor's
 - [x] Scripted sample call on the same screen, for visitors without a microphone
 - [ ] Real call on the deployed URL through the new flow: verification, greeting names the lane, the reveal matches the transcript
 - [ ] Attack replay re-run against the verified-caller desk; README table updated
@@ -104,7 +106,7 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] Scenario runner: N calls × personas × background noise
 - [ ] Report: latency, number-transcription errors, out-of-range prices, mid-number interruptions
 - [ ] LLM comparison: DeepSeek vs a fast Western model on TTFT, tool reliability, cost
-- [ ] Spanish mode
+- [ ] Spanish attack replay (the Spanish Alex shipped in 4b; the replay still runs in English)
 - [ ] Article 2 published
 - [ ] Twilio SIP number attached to the deployed worker
 
