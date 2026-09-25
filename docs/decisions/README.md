@@ -12,3 +12,4 @@ They are written so the choice can be defended in an interview, not only execute
 | [004](ADR-004-price-guardian-in-code.md) | Price limits enforced in code, in two layers |
 | [005](ADR-005-web-client.md) | Next.js + TypeScript client with a server-side token endpoint |
 | [006](ADR-006-gcp-cloud-run.md) | GCP Cloud Run for the agent worker and the web client |
+| [007](ADR-007-verify-the-caller-in-code.md) | Verify the caller in code before any rate |

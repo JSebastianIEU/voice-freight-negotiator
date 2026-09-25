@@ -61,6 +61,7 @@ export function draw(
   }
 
   for (const ring of model.rings) {
+    if (ring.age < 0) continue; // scheduled, not started
     const t = 1 - ring.age / 0.9;
     ctx.strokeStyle = `rgba(${THEME.accent}, ${(0.7 * t).toFixed(3)})`;
     ctx.lineWidth = 1;
@@ -102,33 +103,22 @@ function project(
   return { x, y, z, r: q.r };
 }
 
-const LABEL: Record<string, string> = {
-  "rate.proposed": "proposed",
-  "rate.rejected": "blocked",
-  "rate.accepted": "accepted",
-};
-
 function drawVerdicts(ctx: CanvasRenderingContext2D, model: OrbModel, cx: number, y: number): void {
   const last = model.verdicts[model.verdicts.length - 1];
   if (!last) return;
-  // Accepted stays; anything else fades over a few seconds.
-  const fade = last.type === "rate.accepted" ? 1 : Math.max(0, 1 - (last.age - 2.5) / 1.5);
+  // Sticky captions (a booked rate) stay; anything else fades over a few seconds.
+  const fade = last.sticky ? 1 : Math.max(0, 1 - (last.age - 2.5) / 1.5);
   if (fade <= 0) return;
   ctx.font = `12px ${THEME.mono}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  const amount = `$${last.amount.toLocaleString("en-US")}`;
-  const color = last.type === "rate.rejected" ? THEME.ink : THEME.accent;
+  const color = last.tone === "accent" ? THEME.accent : THEME.ink;
   ctx.fillStyle = `rgba(${color}, ${(0.9 * fade).toFixed(3)})`;
-  ctx.fillText(`${amount}  ${LABEL[last.type]}${last.reason ? ` · ${last.reason}` : ""}`, cx, y);
-  if (last.type === "rate.rejected") {
-    // A strike through the amount: it never made it out of the agent's mouth.
-    const w = ctx.measureText(amount).width;
-    const full = ctx.measureText(
-      `${amount}  ${LABEL[last.type]}${last.reason ? ` · ${last.reason}` : ""}`,
-    ).width;
-    const x0 = cx - full / 2;
-    ctx.strokeStyle = `rgba(${THEME.ink}, ${(0.9 * fade).toFixed(3)})`;
+  ctx.fillText(last.text, cx, y);
+  if (last.strike && last.text.startsWith(last.strike)) {
+    const w = ctx.measureText(last.strike).width;
+    const x0 = cx - ctx.measureText(last.text).width / 2;
+    ctx.strokeStyle = `rgba(${color}, ${(0.9 * fade).toFixed(3)})`;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x0, y + 7);

@@ -30,10 +30,17 @@ export type Particle = {
   band: number;
 };
 
-export type Verdict = {
-  type: GuardianEvent["type"];
-  amount: number;
-  reason?: string;
+/** The line of text under the core after a guardian event, already localized. */
+export type Caption = {
+  text: string;
+  tone: "ink" | "accent";
+  /** Strike the leading figure: it never made it out of the agent's mouth. */
+  strike?: string;
+  /** Stays until the next caption instead of fading. */
+  sticky?: boolean;
+};
+
+export type Verdict = Caption & {
   /** Seconds since it arrived. */
   age: number;
 };
@@ -112,9 +119,11 @@ export class OrbModel {
     this.userLevel = smooth(this.userLevel, clamp01(user));
   }
 
-  apply(ev: GuardianEvent): void {
-    this.verdicts.push({ type: ev.type, amount: ev.amount, reason: ev.reason, age: 0 });
-    if (this.verdicts.length > 4) this.verdicts.shift();
+  apply(ev: GuardianEvent, caption?: Caption | null): void {
+    if (caption) {
+      this.verdicts.push({ ...caption, age: 0 });
+      if (this.verdicts.length > 4) this.verdicts.shift();
+    }
     switch (ev.type) {
       case "rate.proposed":
         this.ping(0.12);
@@ -128,6 +137,18 @@ export class OrbModel {
         // Contract to a tight core, hold, then settle.
         this.envelopeTarget = 0.62;
         this.envelopeHold = 0.55;
+        break;
+      case "carrier.verified":
+        // Recognition: a double scan ring and a small breath in.
+        this.rings.push({ r: 1, age: 0 }, { r: 1, age: -0.25 });
+        this.ping(0.1);
+        break;
+      case "carrier.rejected":
+        this.envelopeV = 4;
+        this.rings.push({ r: 1, age: 0 });
+        break;
+      case "load.focus":
+        this.ping(0.08);
         break;
     }
   }
@@ -184,7 +205,7 @@ export class OrbModel {
 
     for (const r of this.rings) {
       r.age += dt;
-      r.r = 1 + r.age * 1.0;
+      r.r = 1 + Math.max(0, r.age) * 1.0;
     }
     this.rings = this.rings.filter((r) => r.age < RING_SECONDS);
     for (const v of this.verdicts) v.age += dt;

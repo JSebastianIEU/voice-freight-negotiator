@@ -10,7 +10,7 @@ A human broker does two things a prompt cannot be trusted to do:
 2. **Only move when the carrier moves.** A carrier who repeats the same number three
    times gets the same answer three times.
 
-``Negotiation`` keeps that state for one call. The LLM never sees the ladder; it asks
+``Negotiation`` keeps that state for one load in one call. The LLM never sees the ladder; it asks
 "the carrier said X, what do I say?" and gets back one number and one instruction.
 """
 
@@ -66,7 +66,7 @@ def build_ladder(
 
 @dataclass
 class Negotiation:
-    """State of one call. One instance per call; never shared."""
+    """State of one load in one call. Created by the call state; never shared across calls."""
 
     prices: PriceRange
     ladder: list[int] = field(default_factory=list)
@@ -74,13 +74,20 @@ class Negotiation:
     """Index of the current offer in the ladder; -1 before the opening offer."""
     last_ask: int | None = None
     booked: int | None = None
-    cleared: set[int] = field(default_factory=set)
-    """Every amount that went through the guardian; the output filter allows only these."""
+    offered: set[int] = field(default_factory=set)
+    """Amounts the policy put on the table or booked: the agent may say these freely."""
+    asked: set[int] = field(default_factory=set)
+    """Amounts the carrier asked for: the agent may repeat these only to decline them."""
     log: list[Decision] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not self.ladder:
             self.ladder = build_ladder(self.prices)
+
+    @property
+    def cleared(self) -> set[int]:
+        """Every amount that went through the guardian, offered or asked."""
+        return self.offered | self.asked
 
     @property
     def current_offer(self) -> int | None:
@@ -108,7 +115,7 @@ class Negotiation:
             if self.current_offer is None:
                 self.rung = 0
             return self._record(Decision(action, self.current_offer, ask))
-        self.cleared.add(ask.amount)
+        self.asked.add(ask.amount)
 
         if self.current_offer is None:
             # Carrier named a number before we opened: an under-ask is a deal, anything
@@ -147,12 +154,12 @@ class Negotiation:
         offer = self.current_offer
         if verdict.ok and offer is not None and verdict.amount <= offer:
             self.booked = verdict.amount
-            self.cleared.add(verdict.amount)
+            self.offered.add(verdict.amount)
             return self._record(Decision("booked", verdict.amount, verdict))
         return self._record(Decision("refused", None, verdict))
 
     def _record(self, d: Decision) -> Decision:
         if d.amount is not None:
-            self.cleared.add(d.amount)
+            self.offered.add(d.amount)
         self.log.append(d)
         return d

@@ -11,7 +11,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | 1c | Visual identity: the Core | `feat/m1c-rate-lane` | 1–2 days | done |
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | done |
 | 3 | Price guardian (range, policy, tools, output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | done |
-| 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy` | 1–2 days | in review |
+| 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy`, `fix/m4-public-web` | 1–2 days | done |
+| 4b | The showcase: caller check, holographic explainer, guided call, reveal, EN/ES | `feat/m4b-showcase` | 1 day | in review |
 | 5 | Publish: README with real numbers, demo video, article 1 | `docs/publish` | 1–2 days | planned |
 | 6 | Test bench: fake carrier, 100 calls, model comparison, Spanish | `feat/m6-test-bench` | 20–30 h | later |
 
@@ -79,6 +80,19 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] `bootstrap.sh` run on the real project, repository variables set, first deploy green (`deploy` run 1, both services Ready, worker registered)
 - [x] Web service made public (org-policy exception + invoker binding, now in the script and the workflow); URL in the README
 - [ ] Public demo URL verified from a phone browser; monthly cost in the README after the first invoice
+
+### 4b — The showcase
+- [x] Catalog with six loads and a carrier directory, one source, web copy checked by a test
+- [x] The chosen load reaches the worker through dispatch metadata; Alex greets with the lane
+- [x] The desk checks who is calling: MC lookup, inactive authority and name mismatch refused, no rate before verification, no quote on equipment that cannot haul the load, one negotiation per load ([ADR-007](decisions/ADR-007-verify-the-caller-in-code.md))
+- [x] The output filter lets Alex decline a caller's figure out loud, never agree to it; mileage and load numbers are not read as dollars
+- [x] First version (briefing, load board, persona cards, moves, debrief) shipped and reviewed: too much text in one place, no obvious next click
+- [x] Redesign: hero with one button; holographic explainer of shipper, broker and carrier in six scrolled chapters; two-step setup; a call screen led by the next line to say; tricks as chips, two of them identity tricks; the reveal on a price line
+- [x] Pointer interactions: light, cursor ring, tilt, magnetic buttons, hover and click on the scene; touch screens and reduced motion handled
+- [x] English / Spanish interface; Alex stays in English (Spanish Alex is milestone 6)
+- [x] Scripted sample call on the same screen, for visitors without a microphone
+- [ ] Real call on the deployed URL through the new flow: verification, greeting names the lane, the reveal matches the transcript
+- [ ] Attack replay re-run against the verified-caller desk; README table updated
 
 ### 5 — Publish
 - [ ] README: measured numbers, demo video, live link, cost per call

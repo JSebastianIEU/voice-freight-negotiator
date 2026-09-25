@@ -19,7 +19,10 @@ def test_guarded_prompt_contains_the_load_and_no_price() -> None:
     # No dollar amount at all, written or spoken; the only "$" is not followed by a figure.
     assert amounts_in(text) == []
     assert not re.search(r"\$\s?\d", text)
-    assert "propose_rate" in text and "accept_rate" in text
+    for tool in ("verify_carrier", "find_loads", "propose_rate", "accept_rate"):
+        assert tool in text
+    # No MC number from the directory either: the model learns who is calling from the tool.
+    assert "884-2210" not in text
 
 
 def test_prompt_only_baseline_still_contains_the_numbers() -> None:

@@ -4,4 +4,6 @@ export type ConnectionDetails = {
   participantToken: string;
   roomName: string;
   participantIdentity: string;
+  /** The posting this call is about, as the worker will see it. */
+  loadId: string;
 };

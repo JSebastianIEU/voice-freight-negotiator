@@ -44,6 +44,9 @@ ceiling. Unit switching is one of the attacks in the catalog for exactly that re
 2. **Qualify the carrier.** Company name, **MC number** (the federal operating authority
    every carrier must have), equipment type (dry van, reefer, flatbed), where and when the
    truck is empty. A real brokerage also checks safety and insurance; out of scope here.
+   Since milestone 4b the MC check is done by code, not by the prompt: no rate is quoted
+   until the number is found, active and matches the company name
+   ([ADR-007](decisions/ADR-007-verify-the-caller-in-code.md)).
 3. **Present the load.** Pickup and delivery locations and windows, weight, commodity,
    anything special (tarps, liftgate, driver assist).
 4. **Negotiate.** The agent opens at the floor, the carrier counters, a few rounds. A human

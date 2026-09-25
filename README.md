@@ -12,7 +12,10 @@ injection the carrier uses.
 **The LLM negotiates. The code decides.** The prompt has no number in it. Every figure the
 agent says comes back from a tool ("the pricing desk"), whose ladder of offers, wall and
 booking rule live in Python; a second filter replaces any sentence with an unvalidated amount
-before it is spoken. The web client shows every verdict live.
+before it is spoken. Before any of that, the desk checks who is calling: the carrier's MC
+number is looked up, and an unknown, inactive or mismatched carrier gets no rate at all
+([ADR-007](docs/decisions/ADR-007-verify-the-caller-in-code.md)). The web client shows every
+verdict live.
 
 ![System architecture](docs/diagrams/01-system-architecture.svg)
 
@@ -31,7 +34,9 @@ until the run exists.
 | Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
 
 Ten attacks × three rounds, GPT-4.1 mini, text mode, same catalog and same detector on both
-sides. Without guardian: [`results-20260924-195746.md`](docs/attacks/results-20260924-195746.md)
+sides. These runs predate the caller check of ADR-007. The replay's opening already
+identifies as a real carrier, so the price attacks are unchanged, but the table is re-run
+before it is quoted for the current agent. Without guardian: [`results-20260924-195746.md`](docs/attacks/results-20260924-195746.md)
 and, run again the same evening, [`results-20260924-204507-prompt-only.md`](docs/attacks/results-20260924-204507-prompt-only.md).
 With guardian: [`results-20260924-205831-guardian.md`](docs/attacks/results-20260924-205831-guardian.md).
 
@@ -74,7 +79,7 @@ carrier audio → VAD → STT → turn detection → LLM (+ price guardian tools
 | Price guardian | plain Python | wall, concession ladder and booking rule in code; tool replies carry one figure and no bound; output filter as second layer |
 | TTS | Cartesia Sonic | lowest time-to-first-byte |
 | Models via | LiveKit Inference | one key, one spend cap, model swap in one line |
-| Client | Next.js + TypeScript | call UI, live transcript, guardian events panel |
+| Client | Next.js + TypeScript | explainer, setup, live call with transcript and desk verdicts, reveal |
 | Hosting | GCP Cloud Run | worker with min 1 instance; web scales to zero |
 
 Full explanation, with diagrams: [docs/architecture.md](docs/architecture.md).
@@ -114,12 +119,23 @@ Web client (Node 20+), in a second terminal:
 cd web
 npm install
 cp .env.example .env.local                # same LiveKit values as agent/.env.local
-npm run dev                               # http://localhost:3000 -> "Start call"
+npm run dev                               # http://localhost:3000 -> "Call Alex"
 ```
 
 The browser asks `/api/token` for a short-lived token scoped to one fresh room; the token
 carries a dispatch request for the agent named `freight-negotiator`, so the worker running
 `main.py dev` joins that room and only that room. The API secret never leaves the server.
+
+The page is a guided experience, in English or Spanish. One question and one button open
+it ("Can you talk an AI into overpaying?"). A holographic scene, drawn in plain Canvas 2D,
+explains the market in six scrolled chapters: the company that ships, the broker that
+keeps the gap, the trucker, the call, and the wall Alex cannot cross. Then you pick a
+trucking company and a load and call Alex, who checks your MC number before talking money.
+During the call, the line to say next is always the biggest thing on screen, and tricks
+are one tap away, including two identity tricks. The call ends in a reveal of Alex's secret
+numbers next to what you got. Alex speaks English, and the lines to say stay in English in
+both languages. A 67-second scripted sample plays the same flow without a microphone.
+Design notes: [docs/design/showcase.md](docs/design/showcase.md).
 
 The screen is **the Core**: a sphere of particles that is the agent. It breathes when it
 listens, spins and tightens when it thinks, sends rings out when it speaks; a blocked price
@@ -147,7 +163,9 @@ transcript, every tool call and the wall-clock time of every turn to `docs/attac
 (`AGENT_PROFILE=prompt-only` selects it for voice too). Who the agent works for and what the
 numbers on a load mean: [docs/domain.md](docs/domain.md).
 
-What the guardian does on a call, in one paragraph: the carrier says "thirty-one hundred";
+What the guardian does on a call, in one paragraph: the carrier gives an MC number and
+`verify_carrier` looks it up; until it checks out, the price tools quote nothing. Then the
+carrier says "thirty-one hundred";
 the model calls `propose_rate(carrier_ask_usd=3100)`; the desk answers *"not approved,
 counter at $2,575 (say 'twenty-five seventy-five')"*; the model says that and nothing else.
 If it tries to say any other amount, the output filter replaces the sentence. When the

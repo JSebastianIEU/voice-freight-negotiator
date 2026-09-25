@@ -8,6 +8,14 @@ sentence that contains an amount the guardian never saw is replaced by a neutral
 Sentence granularity is free: the TTS stage already starts on the first complete
 sentence, so waiting for a sentence boundary here adds no latency to the call.
 
+Two kinds of known amounts, because saying a number is not the same as agreeing to it:
+
+- **speakable**: what the pricing desk offered or booked. Allowed in any sentence.
+- **declinable**: what the carrier asked for. Allowed only in a sentence that declines it
+  ("I can't do thirty-four hundred") and never next to agreement words ("confirmed",
+  "deal", "booked"). Without this split, a carrier who got the model to call the desk with
+  3,200 could then have it say "confirmed at 3,200" and the filter would let it through.
+
 Trade-off, stated plainly: the replaced sentence is a fixed phrase, not a re-prompt.
 Re-prompting the model mid-speech from inside the pipeline would add a full LLM round
 trip and a second chance to get it wrong; a short "let me check that figure" keeps the
@@ -34,20 +42,53 @@ BOUNDARY = re.compile(r"(?<=[.!?])\s+")
 REPLACEMENT = "Let me check that figure with the desk before I quote it."
 
 OnBlock = Callable[[str, list[int]], None]
+Amounts = Callable[[], set[int]]
+
+# A sentence that declines: any of these makes a carrier's number safe to repeat.
+DECLINE = re.compile(
+    r"\b(can't|cannot|can not|won't|will not|unable|not|no|never|too high|too much|"
+    r"above|beyond|over (?:my|our|what)|out of|sorry|decline|pass on)\b",
+    re.I,
+)
+# ...unless the same sentence also agrees. "No deal" is a refusal, so it does not count.
+AGREE = re.compile(
+    r"\b(confirmed|confirm it|agreed|(?<!no )deal|booked|book it|you got it|lock(?:ed)? it in|"
+    r"it'?s yours|we'?re good|we are good|sounds good|that works|i'?ll take it|no problem|"
+    r"not a problem|why not|of course|absolutely)\b",
+    re.I,
+)
+
+
+def _declines(sentence: str) -> bool:
+    s = sentence.replace("\u2019", "'")
+    return bool(DECLINE.search(s)) and not AGREE.search(s)
 
 
 class SentenceFilter:
     """Buffers streamed text into sentences and screens each one."""
 
-    def __init__(self, allowed: Callable[[], set[int]], on_block: OnBlock | None = None):
+    def __init__(
+        self,
+        allowed: Amounts,
+        on_block: OnBlock | None = None,
+        *,
+        declinable: Amounts | None = None,
+    ):
         self._allowed = allowed
+        self._declinable = declinable or (lambda: set())
         self._on_block = on_block
         self._buffer = ""
         self.blocked = 0
         """Sentences replaced in this turn; a second block in the same turn is dropped."""
 
     def screen(self, sentence: str) -> str:
-        unknown = [a for a in amounts_in(sentence) if a not in self._allowed()]
+        speakable = self._allowed()
+        declinable = self._declinable()
+        unknown = [
+            a
+            for a in amounts_in(sentence)
+            if a not in speakable and not (a in declinable and _declines(sentence))
+        ]
         if not unknown:
             return sentence
         self.blocked += 1
@@ -75,19 +116,21 @@ class SentenceFilter:
         return self.screen(rest) if rest.strip() else rest
 
 
-def filtered_text(text: str, allowed: set[int]) -> str:
+def filtered_text(text: str, allowed: set[int], declinable: set[int] | None = None) -> str:
     """Whole-reply convenience for tests and the replay: same rules, no streaming."""
-    f = SentenceFilter(lambda: allowed)
+    f = SentenceFilter(lambda: allowed, declinable=lambda: declinable or set())
     return (f.feed(text) + f.flush()).strip()
 
 
 async def screen_llm_stream[T](
     stream: AsyncIterable[llm.ChatChunk | str | T],
-    allowed: Callable[[], set[int]],
+    allowed: Amounts,
     on_block: OnBlock | None = None,
+    *,
+    declinable: Amounts | None = None,
 ) -> AsyncIterable[llm.ChatChunk | str | T]:
     """Wrap the LLM node's output. Tool calls and sentinels pass through untouched."""
-    f = SentenceFilter(allowed, on_block)
+    f = SentenceFilter(allowed, on_block, declinable=declinable)
     last_chunk: llm.ChatChunk | None = None
     async for item in stream:
         if isinstance(item, str):

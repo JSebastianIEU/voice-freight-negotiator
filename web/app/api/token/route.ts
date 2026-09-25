@@ -13,19 +13,24 @@
  * LiveKit recommends over the worker auto-joining every room. It matters here
  * because the test bench (milestone 6) adds a second agent, the fake carrier, and
  * the two must never land in the same room by accident.
+ *
+ * The dispatch metadata tells the worker which posting the carrier is calling about
+ * ({ loadId }), exactly like a load-board click. Nothing about the carrier goes in
+ * it: the agent asks for company and MC number the way a rep does.
  */
 
 import { RoomAgentDispatch, RoomConfiguration } from "@livekit/protocol";
 import { AccessToken } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
+import { loads } from "@/lib/catalog";
 import type { ConnectionDetails } from "@/lib/types";
 
 // Tokens are single-use in practice (one call), so a short life limits the damage
 // of a leaked one without getting in the way of a normal conversation.
 const TOKEN_TTL = "15m";
 
-export async function POST(): Promise<NextResponse> {
+export async function POST(req: Request): Promise<NextResponse> {
   const serverUrl = process.env.LIVEKIT_URL;
   const apiKey = process.env.LIVEKIT_API_KEY;
   const apiSecret = process.env.LIVEKIT_API_SECRET;
@@ -42,6 +47,17 @@ export async function POST(): Promise<NextResponse> {
       { error: `Server is missing ${missing.join(", ")}. Copy web/.env.example to web/.env.local.` },
       { status: 500 },
     );
+  }
+
+  // The load must be one we post; anything else falls back to the first on the board.
+  let loadId = loads[0].id;
+  try {
+    const body = (await req.json()) as { loadId?: unknown };
+    if (typeof body.loadId === "string" && loads.some((l) => l.id === body.loadId)) {
+      loadId = body.loadId;
+    }
+  } catch {
+    // no body or not JSON: default load
   }
 
   // A fresh room per call keeps conversations isolated from each other.
@@ -62,7 +78,7 @@ export async function POST(): Promise<NextResponse> {
     canPublishData: true, // reserved for text input later
   });
   token.roomConfig = new RoomConfiguration({
-    agents: [new RoomAgentDispatch({ agentName })],
+    agents: [new RoomAgentDispatch({ agentName, metadata: JSON.stringify({ loadId }) })],
   });
 
   const details: ConnectionDetails = {
@@ -70,6 +86,7 @@ export async function POST(): Promise<NextResponse> {
     participantToken: await token.toJwt(),
     roomName,
     participantIdentity,
+    loadId,
   };
   return NextResponse.json(details, {
     status: 201,

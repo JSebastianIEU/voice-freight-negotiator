@@ -13,7 +13,7 @@ flowchart LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
         STT --> TD["Turn detector<br/>LiveKit model"]
         TD --> LLM["LLM<br/>GPT-4.1 mini"]
-        LLM <-->|"propose_rate(amount)<br/>accept_rate(amount)"| PG["Price guardian<br/>min/max in code"]
+        LLM <-->|"verify_carrier · find_loads<br/>propose_rate · accept_rate"| PG["The desk (code)<br/>carrier directory · loads<br/>price limits"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]
         CTX[("Context<br/>conversation history")] -.-> LLM
@@ -22,7 +22,7 @@ flowchart LR
     B <-->|"audio in / out"| R
     R -->|"carrier audio track"| VAD
     TTS -->|"agent audio track"| R
-    PG -.->|"rate.proposed / rejected / accepted<br/>(data channel)"| R
+    PG -.->|"carrier.verified / rejected<br/>rate.proposed / rejected / accepted<br/>(data channel)"| R
 
     classDef guard fill:#ffe9e0,stroke:#c0392b,stroke-width:2px,color:#000;
     class PG,OF guard;

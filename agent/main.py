@@ -14,6 +14,7 @@ is why, in production, it must run as an always-on process (see ADR-006).
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 
@@ -60,8 +61,13 @@ async def entrypoint(ctx: JobContext) -> None:
     # README's latency number comes from.
     TurnMetricsRecorder(settings.metrics_path).attach(session)
 
+    # The web client's load board puts the chosen load id in the dispatch metadata, the
+    # same way a carrier calls about one posting. Nothing about the carrier travels this
+    # way: Alex asks, like a rep would.
+    load_id = _load_id_from(ctx.job.metadata)
     # Guardian verdicts go to the browser over the room's data channel; the Core reacts.
-    profile = build_profile(settings, publish=room_publisher(ctx.room))
+    profile = build_profile(settings, publish=room_publisher(ctx.room), load_id=load_id)
+    logger.info("call for load %s in room %s", profile.load_id, ctx.room.name)
     await session.start(
         agent=profile.agent,
         room=ctx.room,
@@ -70,6 +76,17 @@ async def entrypoint(ctx: JobContext) -> None:
 
     # The agent speaks first so the caller knows the line is open.
     await session.generate_reply(instructions=profile.greeting)
+
+
+def _load_id_from(metadata: str | None) -> str | None:
+    """Dispatch metadata is free text; ours is JSON like {"loadId": "CHI-DAL-4471"}."""
+    if not metadata:
+        return None
+    try:
+        value = json.loads(metadata).get("loadId")
+    except (ValueError, AttributeError):
+        return None
+    return value if isinstance(value, str) else None
 
 
 if __name__ == "__main__":

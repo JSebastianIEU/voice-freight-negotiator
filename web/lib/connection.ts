@@ -1,11 +1,16 @@
 import type { ConnectionDetails } from "@/lib/types";
 
 /**
- * Ask our own server for a room token. The browser never touches the LiveKit
- * secret; see app/api/token/route.ts for why.
+ * Ask our own server for a room token for one posting. The browser never touches
+ * the LiveKit secret; see app/api/token/route.ts for why.
  */
-export async function fetchConnectionDetails(): Promise<ConnectionDetails> {
-  const res = await fetch("/api/token", { method: "POST", cache: "no-store" });
+export async function fetchConnectionDetails(loadId: string): Promise<ConnectionDetails> {
+  const res = await fetch("/api/token", {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ loadId }),
+  });
   if (!res.ok) {
     let message = `Token request failed (${res.status})`;
     try {

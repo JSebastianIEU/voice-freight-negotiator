@@ -45,4 +45,4 @@ class PromptOnlyNegotiator(Agent):
 
     @property
     def greeting_instructions(self) -> str:
-        return greeting_instructions()
+        return greeting_instructions(self.load.spoken_lane)
