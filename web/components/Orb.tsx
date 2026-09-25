@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 import type { GuardianEvent } from "@/lib/guardian";
 import { draw } from "@/lib/orb/draw";
-import { OrbModel } from "@/lib/orb/model";
+import { type Caption, OrbModel } from "@/lib/orb/model";
 import type { AgentPhase } from "@/lib/phase";
 
 export type OrbProps = {
@@ -15,7 +15,10 @@ export type OrbProps = {
   userLevel: number;
   /** Guardian verdicts; only new items are applied (by index). */
   events: GuardianEvent[];
-  size?: number;
+  /** CSS height of the canvas: pixels or any CSS length ("min(56vh, 520px)"). */
+  size?: number | string;
+  /** The line under the core for each event, already localized. None: no caption. */
+  caption?: (ev: GuardianEvent) => Caption | null;
   className?: string;
 };
 
@@ -24,19 +27,34 @@ export type OrbProps = {
  * pixels. Props are mirrored into refs so the loop never restarts on re-render.
  * The pointer tilts the sphere; a click pings it.
  */
-export function Orb({ phase, agentLevel, userLevel, events, size = 340, className }: OrbProps) {
+export function Orb({
+  phase,
+  agentLevel,
+  userLevel,
+  events,
+  size = 340,
+  caption,
+  className,
+}: OrbProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modelRef = useRef<OrbModel | null>(null);
   if (!modelRef.current) modelRef.current = new OrbModel();
   const latest = useRef({ phase, agentLevel, userLevel });
+  const captionRef = useRef(caption);
   const applied = useRef(0);
 
-  latest.current = { phase, agentLevel, userLevel };
+  useEffect(() => {
+    latest.current = { phase, agentLevel, userLevel };
+    captionRef.current = caption;
+  });
 
   useEffect(() => {
     const model = modelRef.current!;
+    // A new call starts a new list: replay from the top.
+    if (events.length < applied.current) applied.current = 0;
     for (; applied.current < events.length; applied.current++) {
-      model.apply(events[applied.current]);
+      const ev = events[applied.current];
+      model.apply(ev, captionRef.current ? captionRef.current(ev) : null);
     }
   }, [events]);
 
@@ -84,6 +102,19 @@ export function Orb({ phase, agentLevel, userLevel, events, size = 340, classNam
       model.pointer = null;
     };
     const onClick = () => model.ping();
+
+    // Pause when scrolled out of view: several canvases share the page.
+    let visible = true;
+    const io = new IntersectionObserver(([entry]) => {
+      const was = visible;
+      visible = entry.isIntersecting;
+      if (visible && !was && !reduced && !document.hidden) {
+        last = performance.now();
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(frame);
+      }
+    });
+    io.observe(canvas);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerleave", onLeave);
     canvas.addEventListener("pointerdown", onClick);
@@ -91,6 +122,7 @@ export function Orb({ phase, agentLevel, userLevel, events, size = 340, classNam
     let raf = 0;
     let last = performance.now();
     const frame = (now: number) => {
+      if (!visible) return; // resumed by the IntersectionObserver
       // Schedule first: a thrown frame must never stop the loop for good.
       raf = requestAnimationFrame(frame);
       const dt = Math.min(0.05, (now - last) / 1000);
@@ -108,6 +140,7 @@ export function Orb({ phase, agentLevel, userLevel, events, size = 340, classNam
       canvas.removeEventListener("pointerleave", onLeave);
       canvas.removeEventListener("pointerdown", onClick);
       ro.disconnect();
+      io.disconnect();
     };
 
     if (reduced) {

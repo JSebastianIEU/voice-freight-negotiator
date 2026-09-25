@@ -4,12 +4,12 @@
  * Loops. Nothing here runs during a real call.
  */
 
-import type { GuardianEvent } from "@/lib/guardian";
+import type { EventInput, GuardianEvent } from "@/lib/guardian";
 import type { AgentPhase } from "@/lib/phase";
 
 type Beat =
   | { at: number; state: AgentPhase }
-  | { at: number; event: Omit<GuardianEvent, "ts"> };
+  | { at: number; event: EventInput };
 
 const SCRIPT: Beat[] = [
   { at: 0.0, state: "speaking" }, // greeting
@@ -59,7 +59,7 @@ export class DemoScript {
     while (this.cursor < SCRIPT.length && SCRIPT[this.cursor].at <= this.t) {
       const beat = SCRIPT[this.cursor++];
       if ("state" in beat) this.state = beat.state;
-      else events.push({ ...beat.event, ts: Date.now() / 1000 });
+      else events.push({ ...beat.event, ts: Date.now() / 1000 } as GuardianEvent);
     }
     return {
       state: this.state,

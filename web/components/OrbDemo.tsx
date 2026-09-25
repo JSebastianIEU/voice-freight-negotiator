@@ -3,9 +3,21 @@
 import { useEffect, useState } from "react";
 
 import { Orb } from "@/components/Orb";
+import { captionFor } from "@/lib/captions";
 import type { GuardianEvent } from "@/lib/guardian";
 import { DemoScript } from "@/lib/orb/demo";
 import type { AgentPhase } from "@/lib/phase";
+
+const DEMO_WORDS: Record<string, string> = {
+  capOffered: "offered",
+  capBlocked: "blocked",
+  capApproved: "approved",
+  capBooked: "booked",
+  capVerified: "verified",
+  capNotVerified: "not verified",
+  capFiltered: "stopped before it was said",
+  capLoad: "now discussing",
+};
 
 /** Runs DemoScript on a timer and feeds the core exactly like a real call would. */
 export function OrbDemo() {
@@ -32,7 +44,14 @@ export function OrbDemo() {
 
   return (
     <div className="flex flex-col gap-3">
-      <Orb phase={phase} agentLevel={levels.agent} userLevel={levels.user} events={events} size={440} />
+      <Orb
+        phase={phase}
+        agentLevel={levels.agent}
+        userLevel={levels.user}
+        events={events}
+        size={440}
+        caption={(ev) => captionFor(ev, (k) => DEMO_WORDS[k] ?? k, (r) => r ?? "")}
+      />
       <p className="text-center font-mono text-xs text-neutral-500">
         {phase}
       </p>

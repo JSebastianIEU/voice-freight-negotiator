@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Voice Freight Negotiator",
-  description: "Talk to a voice agent that negotiates freight rates and cannot be talked out of its limits.",
+  description:
+    "Can you talk an AI into overpaying? Call Alex, a voice agent that hires trucks by phone, and try to push it past a limit that lives in code.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
