@@ -58,6 +58,13 @@ the injection attack: the model answered with an amount it had never run through
 the desk" and the call went on. The cost is one LLM round trip on the turns where money comes
 up: 58 tool calls in 180 turns, +94 ms on the median turn, +367 ms on the mean.
 
+What the transcripts showed after the table passed: the guardian judged only the parts the
+model chose to send it. It checked $2,900 of "$2,900 plus $250 deadhead" and trusted the
+model to read "3,300 Canadian", and its wording told the model whether an ask was under the
+ceiling. The desk now computes totals from every component, refuses other currencies, and
+answers only yes or no; tests cover all three. These runs are text mode, so the median has
+no STT or TTS in it, and a misheard "fourteen" for "forty" is the voice bench's job.
+
 First latency measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
 end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. After the model change
 and endpointing tuning: 1447–2341 ms (n=5). The table gets its final latency after milestone 3.

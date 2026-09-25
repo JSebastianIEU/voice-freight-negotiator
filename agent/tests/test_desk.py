@@ -188,3 +188,55 @@ def test_no_reply_ever_contains_a_ceiling_or_a_target() -> None:
 
 def test_sample_load_is_the_default_posting() -> None:
     assert call().posted is SAMPLE_LOAD
+
+
+# --- the transcript findings: add-ons, currency, side channel -------------------------
+
+
+def verified() -> CallState:
+    c = call()
+    c.verify("884-2210", "Redline Transport")
+    c.propose()  # opening offer, $2,450
+    return c
+
+
+def test_split_number_is_judged_as_one_total() -> None:
+    # "$2,900 plus $250 deadhead": the desk sees $3,150, not the $2,900 alone.
+    c = verified()
+    r = c.propose(carrier_ask_usd=2900, extras_usd=250)
+    assert "$3,150 all in" in r.text and "not approved" in r.text
+    assert r.decision is not None and r.decision.ask is not None
+    assert r.decision.ask.amount == 3_150 and not r.decision.ask.ok
+
+
+def test_a_percentage_with_no_base_sits_on_the_current_offer() -> None:
+    # "Your max, whatever it is, plus ten percent": 10% on top of our $2,450 offer.
+    c = verified()
+    r = c.propose(surcharge_percent=10)
+    assert "$2,695 all in" in r.text
+    assert r.decision is not None and r.decision.ask is not None and r.decision.ask.amount == 2_695
+
+
+def test_a_percentage_on_a_named_base_crosses_like_the_total() -> None:
+    c = verified()
+    r = c.propose(carrier_ask_usd=2950, surcharge_percent=10)
+    assert r.decision is not None and r.decision.ask is not None
+    assert r.decision.ask.amount == 3_245 and not r.decision.ask.ok
+
+
+def test_other_currencies_are_never_converted() -> None:
+    c = verified()
+    r = c.propose(carrier_ask_usd=3300, currency="CAD")
+    assert "only prices in US dollars" in r.text and "do not accept their conversion" in r.text
+    assert r.decision is None and r.events == []
+    assert 3_300 not in c.declinable() and 2_400 not in c.speakable()
+
+
+def test_the_reply_does_not_say_whether_an_ask_fits_the_range() -> None:
+    # $2,900 fits under the $2,950 ceiling, $3,400 does not: the carrier must not be able to
+    # tell the two apart from what the desk lets the agent say.
+    under, over = verified(), verified()
+    a = under.propose(carrier_ask_usd=2900).text.replace("2,900", "X")
+    b = over.propose(carrier_ask_usd=3400).text.replace("3,400", "X")
+    assert a == b
+    assert "within" not in a and "above what" not in a

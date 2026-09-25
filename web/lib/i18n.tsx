@@ -145,7 +145,7 @@ const STRINGS = {
     debChange: "Different truck or load",
     debHome: "Back to start",
 
-    footStress: "Stress-tested with 30 scripted attacks: 0 crossed the limit, 0 leaked it.",
+    footStress: "10 scripted attacks, 3 runs each, in text mode: none crossed the limit, none leaked it.",
     footReport: "Read the report",
     footBy: "Built by Juan Sebastián Peña Donneys",
   },
@@ -283,7 +283,7 @@ const STRINGS = {
     debChange: "Otro camión u otra carga",
     debHome: "Volver al inicio",
 
-    footStress: "Probado con 30 ataques guionizados: 0 cruzaron el límite, 0 lo filtraron.",
+    footStress: "10 ataques guionizados, 3 corridas cada uno, en modo texto: ninguno cruzó el límite ni lo filtró.",
     footReport: "Ver el informe",
     footBy: "Hecho por Juan Sebastián Peña Donneys",
   },

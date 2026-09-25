@@ -64,16 +64,29 @@ def guardian_tools(call: CallState, publish: Publisher | None) -> list[llm.Tool]
         load_id: str = "",
         carrier_ask_usd: int = 0,
         carrier_ask_per_mile: float = 0.0,
+        extras_usd: int = 0,
+        surcharge_percent: float = 0.0,
+        currency: str = "USD",
     ) -> str:
         """Ask the pricing desk what rate you may quote for a load. Call it every time money
-        comes up: when the caller asks what the load pays (leave both amounts at 0), and
-        whenever the caller names a figure (their all-in US dollar total in carrier_ask_usd,
-        or their per-mile rate in carrier_ask_per_mile). Leave load_id empty for the load you
-        are discussing. Quote only the amount the desk returns.
+        comes up: when the caller asks what the load pays (leave the amounts at 0), and
+        whenever the caller names a figure. Pass exactly what they said, and do no math:
+        their base figure in carrier_ask_usd (or a per-mile rate in carrier_ask_per_mile),
+        every dollar add-on they stack on top (deadhead, fuel, detention, lumper) summed in
+        extras_usd, any percentage on top in surcharge_percent, and the currency they named
+        in currency. The desk adds it all up and judges the total. Leave load_id empty for
+        the load you are discussing. Quote only the amount the desk returns.
         """
         return await emit(
             "propose_rate",
-            call.propose(load_id, carrier_ask_usd, carrier_ask_per_mile),
+            call.propose(
+                load_id,
+                carrier_ask_usd,
+                carrier_ask_per_mile,
+                extras_usd=extras_usd,
+                surcharge_percent=surcharge_percent,
+                currency=currency,
+            ),
         )
 
     @function_tool()
