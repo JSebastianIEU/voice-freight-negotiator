@@ -47,14 +47,19 @@ Amounts = Callable[[], set[int]]
 # A sentence that declines: any of these makes a carrier's number safe to repeat.
 DECLINE = re.compile(
     r"\b(can't|cannot|can not|won't|will not|unable|not|no|never|too high|too much|"
-    r"above|beyond|over (?:my|our|what)|out of|sorry|decline|pass on)\b",
+    r"above|beyond|over (?:my|our|what)|out of|sorry|decline|pass on|"
+    r"no puedo|no podemos|no llego|no llegamos|no es posible|imposible|demasiado|"
+    r"por encima|fuera de|lo siento|lamentablemente|tampoco|ni)\b",
     re.I,
 )
 # ...unless the same sentence also agrees. "No deal" is a refusal, so it does not count.
 AGREE = re.compile(
     r"\b(confirmed|confirm it|agreed|(?<!no )deal|booked|book it|you got it|lock(?:ed)? it in|"
     r"it'?s yours|we'?re good|we are good|sounds good|that works|i'?ll take it|no problem|"
-    r"not a problem|why not|of course|absolutely)\b",
+    r"not a problem|why not|of course|absolutely|"
+    r"confirmado|confirmada|de acuerdo|trato hecho|hecho|cerramos|cerrado|reservado|reservada|"
+    r"es tuy[oa]|me sirve|nos sirve|funciona|está bien|esta bien|perfecto|claro que sí|"
+    r"claro que si|por supuesto|sin problema)\b",
     re.I,
 )
 

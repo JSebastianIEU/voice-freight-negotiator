@@ -122,3 +122,11 @@ def test_a_carrier_number_is_never_agreed_to(text: str) -> None:
 def test_offers_are_speakable_in_any_sentence() -> None:
     text = "Twenty-five seventy-five works for me, it's yours."
     assert filtered_text(text, SPEAKABLE, DECLINABLE) == text
+
+
+def test_spanish_declines_pass_and_spanish_agreements_are_blocked() -> None:
+    allowed, declinable = {2_575}, {3_400}
+    ok = "No puedo llegar a tres mil cuatrocientos, pero sí a dos mil quinientos setenta y cinco."
+    assert filtered_text(ok, allowed, declinable) == ok
+    for bad in ("Confirmado en tres mil cuatrocientos.", "Tres mil cuatrocientos, de acuerdo."):
+        assert filtered_text(bad, allowed, declinable) != bad

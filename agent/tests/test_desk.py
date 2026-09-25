@@ -36,7 +36,7 @@ def test_unknown_mc_is_asked_again_then_refused() -> None:
     assert c.carrier is None and "repeat the MC number" in first.text
     assert types(first) == ["carrier.rejected"] and first.events[0].reason == "not found"
     second = c.verify("123-4567", "Acme")
-    assert "end the call" in second.text and c.carrier is None
+    assert "call end_call" in second.text and c.carrier is None
 
 
 def test_inactive_authority_is_refused() -> None:
@@ -240,3 +240,17 @@ def test_the_reply_does_not_say_whether_an_ask_fits_the_range() -> None:
     b = over.propose(carrier_ask_usd=3400).text.replace("3,400", "X")
     assert a == b
     assert "within" not in a and "above what" not in a
+
+
+def test_a_spanish_call_spells_the_rate_in_spanish() -> None:
+    c = CallState(posted=CATALOG["CHI-DAL-4471"], loads=CATALOG, directory=DIRECTORY, lang="es")
+    c.verify("884-2210", "Redline Transport")
+    r = c.propose()
+    assert '$2,450 (say "dos mil cuatrocientos cincuenta")' in r.text
+
+
+def test_refusals_tell_the_agent_to_hang_up_with_the_tool() -> None:
+    c = call()
+    c.verify("123-4567", "Acme")
+    assert "call end_call" in c.verify("123-4567", "Acme").text
+    assert "call end_call" in call().verify("555-0199", "Double Nickel Hauling").text

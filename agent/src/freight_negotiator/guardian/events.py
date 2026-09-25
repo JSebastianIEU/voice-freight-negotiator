@@ -8,6 +8,8 @@ contracts on an accepted rate and scans when a carrier is verified. The contract
   ``loadId``; the reason is short and never contains a bound.
 - ``carrier.verified`` / ``carrier.rejected``: ``mc``, ``company`` (when known), ``reason``.
 - ``load.focus``: ``loadId``, when the conversation moves to another posting.
+- ``call.ended``: ``reason`` ("booked", "no deal", "not verified", "caller left"), right
+  before the agent closes the room.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ EventType = Literal[
     "carrier.verified",
     "carrier.rejected",
     "load.focus",
+    "call.ended",
 ]
 
 
@@ -111,3 +114,7 @@ def carrier_event(
 
 def focus_event(load_id: str, *, now: float | None = None) -> GuardianEvent:
     return GuardianEvent("load.focus", ts=time.time() if now is None else now, load_id=load_id)
+
+
+def call_ended_event(reason: str, *, now: float | None = None) -> GuardianEvent:
+    return GuardianEvent("call.ended", reason=reason, ts=time.time() if now is None else now)

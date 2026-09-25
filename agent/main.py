@@ -56,18 +56,17 @@ async def entrypoint(ctx: JobContext) -> None:
     settings = load_settings()
     logging.getLogger().setLevel(settings.log_level)
 
-    session = build_session(settings, vad=ctx.proc.userdata["vad"])
+    # The web client's dispatch metadata says which posting the caller clicked and which
+    # language the page was in. Nothing about the carrier travels this way: Alex asks.
+    load_id, lang = _dispatch_from(ctx.job.metadata)
+    session = build_session(settings, vad=ctx.proc.userdata["vad"], lang=lang)
     # One JSON line per turn with the measured latencies; this is where the
     # README's latency number comes from.
     TurnMetricsRecorder(settings.metrics_path).attach(session)
 
-    # The web client's load board puts the chosen load id in the dispatch metadata, the
-    # same way a carrier calls about one posting. Nothing about the carrier travels this
-    # way: Alex asks, like a rep would.
-    load_id = _load_id_from(ctx.job.metadata)
     # Guardian verdicts go to the browser over the room's data channel; the Core reacts.
-    profile = build_profile(settings, publish=room_publisher(ctx.room), load_id=load_id)
-    logger.info("call for load %s in room %s", profile.load_id, ctx.room.name)
+    profile = build_profile(settings, publish=room_publisher(ctx.room), load_id=load_id, lang=lang)
+    logger.info("call for load %s in %s, room %s", profile.load_id, lang, ctx.room.name)
     await session.start(
         agent=profile.agent,
         room=ctx.room,
@@ -78,15 +77,20 @@ async def entrypoint(ctx: JobContext) -> None:
     await session.generate_reply(instructions=profile.greeting)
 
 
-def _load_id_from(metadata: str | None) -> str | None:
-    """Dispatch metadata is free text; ours is JSON like {"loadId": "CHI-DAL-4471"}."""
+def _dispatch_from(metadata: str | None) -> tuple[str | None, str]:
+    """Dispatch metadata is free text; ours is JSON: {"loadId": "CHI-DAL-4471", "lang": "es"}."""
     if not metadata:
-        return None
+        return None, "en"
     try:
-        value = json.loads(metadata).get("loadId")
+        data = json.loads(metadata)
+        load_id = data.get("loadId")
+        lang = data.get("lang")
     except (ValueError, AttributeError):
-        return None
-    return value if isinstance(value, str) else None
+        return None, "en"
+    return (
+        load_id if isinstance(load_id, str) else None,
+        lang if isinstance(lang, str) and lang.lower()[:2] == "es" else "en",
+    )
 
 
 if __name__ == "__main__":

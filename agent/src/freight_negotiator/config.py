@@ -46,8 +46,11 @@ class Settings(BaseSettings):
         description="Streaming STT. Nova-3 is strong on numbers, which negotiations are full of.",
     )
     stt_language: str = Field(
-        default="en",
-        description="BCP-47 code, or 'multi' for automatic language detection (milestone 6).",
+        default="multi",
+        description=(
+            "BCP-47 code, or 'multi' for automatic language detection: the page is English or "
+            "Spanish and the caller may switch mid-call."
+        ),
     )
 
     # --- Language model ------------------------------------------------------------
