@@ -90,6 +90,22 @@ Region: pick the Cloud Run region closest to the LiveKit Cloud project's region 
 dashboard shows it). The worker's turn-detection round trip and the media path both cross
 that distance on every turn.
 
+## First deploy: what went wrong and why (2026-09-25)
+
+Recorded because each one is a real operator lesson:
+
+- **`gcloud run services replace` does not make a service public.** IAM is separate from
+  the service spec; the URL answered 403 until `allUsers` got `roles/run.invoker`. The
+  deploy workflow now has a "Make web public" step.
+- **Google Workspace organizations restrict IAM members to their own domain** by default
+  (`iam.allowedPolicyMemberDomains`), so `allUsers` was rejected with "do not belong to a
+  permitted customer". `bootstrap.sh` sets a project-level `allowAll` exception; it takes
+  about two minutes to propagate, during which the binding still fails.
+- **The pool binding fails right after the pool is created** (IAM eventual consistency);
+  the script retries.
+- **A budget must be in the billing account's currency** (COP here); any other currency is
+  a bare `INVALID_ARGUMENT`.
+
 ## Checking a deployment
 
 ```bash
