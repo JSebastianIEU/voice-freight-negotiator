@@ -46,10 +46,12 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm run lint
-      - run: npx tsc --noEmit
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+      # After the build: Next.js 16 generates the typed route helpers (LayoutProps,
+      # PageProps) into .next/types during the build, and tsc needs them.
+      - run: npx tsc --noEmit
 
   images:
     name: images · docker build
