@@ -98,6 +98,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 
 ### 5 — Publish
 - [ ] README: measured numbers, demo video, live link, cost per call
+- [x] Article 1 drafted from the recorded runs (`docs/articles/01-how-to-stop-an-ai-agent-from-giving-away-your-money.md`)
+- [x] Article 1 figures: nine charts and diagrams drawn from the replay reports plus five showcase screenshots (`docs/articles/figures/`)
 - [ ] Article 1 published on Medium
 - [ ] HappyRobot contacted with the repo and the article
 

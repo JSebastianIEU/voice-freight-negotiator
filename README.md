@@ -228,7 +228,7 @@ Measured cost per call: `[X]` (filled by the test bench).
 
 ## Articles
 
-1. *How to stop an AI agent from giving away your money in a negotiation* — after milestone 5.
+1. *How to stop an AI agent from giving away your money in a negotiation* — [draft](docs/articles/01-how-to-stop-an-ai-agent-from-giving-away-your-money.md) with its [figures](docs/articles/figures/); Medium publication pending.
 2. *I tested my voice agent with 100 calls: here's what broke* — after milestone 6.
 
 Outlines in [docs/articles/outline.md](docs/articles/outline.md).
