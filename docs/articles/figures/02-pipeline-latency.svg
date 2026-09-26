@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="820" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The voice pipeline, and where a turn's 1.8 seconds go</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Every box runs on every turn. The two orange ones are the subject of this article.</text>
+<rect x="56" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="142.875" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Caller audio</text>
+<text x="142.875" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">WebRTC, UDP</text>
+<line x1="231.75" y1="208.0" x2="241.75" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="241.75" y1="208.0" x2="230.94463477176788" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="241.75" y1="208.0" x2="230.94463477176788" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="243.75" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="330.625" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">VAD</text>
+<text x="330.625" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Silero</text>
+<text x="330.625" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">is someone speaking?</text>
+<line x1="419.5" y1="208.0" x2="429.5" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="429.5" y1="208.0" x2="418.6946347717679" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="429.5" y1="208.0" x2="418.6946347717679" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="431.5" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="518.375" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">STT</text>
+<text x="518.375" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Deepgram Nova-3</text>
+<text x="518.375" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">streaming text</text>
+<line x1="607.25" y1="208.0" x2="617.25" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="617.25" y1="208.0" x2="606.4446347717678" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="617.25" y1="208.0" x2="606.4446347717678" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="619.25" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="706.125" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Turn detector</text>
+<text x="706.125" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LiveKit</text>
+<text x="706.125" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">done, or mid-number?</text>
+<line x1="795.0" y1="208.0" x2="805.0" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="805.0" y1="208.0" x2="794.1946347717678" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="805.0" y1="208.0" x2="794.1946347717678" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="807.0" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="893.875" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LLM</text>
+<text x="893.875" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">GPT-4.1 mini</text>
+<text x="893.875" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">chooses the words</text>
+<line x1="982.75" y1="200.0" x2="992.75" y2="200.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="992.75" y1="200.0" x2="981.9446347717678" y2="205.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="992.75" y1="200.0" x2="981.9446347717678" y2="194.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="992.75" y1="216.0" x2="982.75" y2="216.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="982.75" y1="216.0" x2="993.5553652282322" y2="210.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="982.75" y1="216.0" x2="993.5553652282322" y2="221.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="994.75" y="160" width="173.75" height="96" rx="10" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1081.625" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The desk</text>
+<text x="1081.625" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Python</text>
+<text x="1081.625" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">decides every number</text>
+<line x1="1170.5" y1="208.0" x2="1180.5" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1180.5" y1="208.0" x2="1169.6946347717678" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1180.5" y1="208.0" x2="1169.6946347717678" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="1182.5" y="160" width="173.75" height="96" rx="10" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1269.375" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Output filter</text>
+<text x="1269.375" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Python</text>
+<text x="1269.375" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">screens each sentence</text>
+<line x1="1358.25" y1="208.0" x2="1368.25" y2="208.0" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1368.25" y1="208.0" x2="1357.4446347717678" y2="213.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1368.25" y1="208.0" x2="1357.4446347717678" y2="202.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<rect x="1370.25" y="160" width="173.75" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="1457.125" y="202" font-size="17" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">TTS</text>
+<text x="1457.125" y="224" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Cartesia Sonic</text>
+<text x="1457.125" y="240" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the voice</text>
+<text x="56" y="292" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LLM ⇄ desk: one extra round trip whenever money or identity comes up. The filter costs nothing: TTS already starts on the first complete sentence.</text>
+<text x="56" y="400" font-size="18" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">One real call from a browser, 8 turns. Median from the caller's last word to Alex's first sound: 1.78 s</text>
+<text x="56" y="426" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Measured by the worker on Cloud Run (europe-west1). The desk's round trips are inside the LLM segment when they happen.</text>
+<rect x="56" y="470" width="1021.9910263600673" height="44" rx="4" fill="#e6e5e1" stroke="none" stroke-width="1"/>
+<text x="68" y="498" font-size="15" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">waiting for the caller to finish, STT final, network · 1.23 s</text>
+<rect x="1079.9910263600673" y="470" width="356.85586090858106" height="44" rx="4" fill="#2a78d6" stroke="none" stroke-width="1"/>
+<rect x="1438.8468872686483" y="470" width="103.15311273135165" height="44" rx="4" fill="#eb6834" stroke="none" stroke-width="1"/>
+<rect x="1079.9910263600673" y="526" width="12" height="12" rx="2" fill="#2a78d6" stroke="none" stroke-width="1"/>
+<text x="1097.9910263600673" y="537" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LLM time to first token · 0.43 s</text>
+<rect x="1079.9910263600673" y="550" width="12" height="12" rx="2" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="1097.9910263600673" y="561" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">TTS time to first byte · 0.13 s</text>
+<line x1="56.0" y1="578" x2="56.0" y2="586" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="56.0" y="604" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0.0 s</text>
+<line x1="473.2742568704431" y1="578" x2="473.2742568704431" y2="586" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="473.2742568704431" y="604" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0.5 s</text>
+<line x1="890.5485137408862" y1="578" x2="890.5485137408862" y2="586" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="890.5485137408862" y="604" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1.0 s</text>
+<line x1="1307.8227706113291" y1="578" x2="1307.8227706113291" y2="586" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="1307.8227706113291" y="604" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1.5 s</text>
+<text x="56" y="640" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Why the gray part is the biggest: the turn detector waits up to 1.2 s after silence when it is not sure the caller has finished,</text>
+<text x="56" y="662" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">because "thirty-two... fifty" is one number. Cutting that wait is a bench experiment, not a code change.</text>
+<text x="1544" y="790" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author.</text>
+</svg>
