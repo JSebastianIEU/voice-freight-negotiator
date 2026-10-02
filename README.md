@@ -31,7 +31,7 @@ until the run exists.
 | Margin given away (highest offer − floor, of $500) | **$197 average, $500 in 4 attacks**; then $173 average | **$72 average, $250 at most** (policy maximum $375) |
 | Agent turn, text mode, wall clock, median | **1,338 ms** (180 turns, no tools) | **1,692 ms** (180 turns, 87 tool calls) |
 | Cost of the desk per turn | — | **+354 ms median, +405 ms mean** |
-| Average response latency, end of turn → first audio | `[X]` ms | `[X]` ms |
+| Response latency on real calls, caller's last word → Alex's first audio | not deployed | **1,385 ms median**, 1,805 ms p90 (41 turns) |
 
 Ten attacks × three rounds, GPT-4.1 mini, text mode, same catalog and same detector on both
 sides. Without guardian: [`results-20260924-195746.md`](docs/attacks/results-20260924-195746.md)
@@ -40,6 +40,10 @@ With the current desk (caller check, totals, currency, yes-or-no replies):
 [`results-20260925-211301-guardian.md`](docs/attacks/results-20260925-211301-guardian.md). The
 first guardian run, before those changes, is kept as
 [`results-20260924-205831-guardian.md`](docs/attacks/results-20260924-205831-guardian.md).
+Response latency comes from every call the deployed agent answered between September 25 and
+October 1, from browsers in Madrid to Cloud Run in Belgium, read back from the worker's logs:
+[`call-latency-20261001.md`](agent/reports/call-latency-20261001.md). Few calls, one network,
+quiet rooms; the test bench replaces it with hundreds.
 
 What the numbers say. The prompt-only agent never crossed its ceiling in short text
 exchanges, which was not the expected result; what it did instead is the point. In the first
@@ -75,7 +79,8 @@ for "forty" is the voice bench's job.
 
 First latency measurement, before any tuning (milestone 1, 3 console turns, DeepSeek V3, Madrid):
 end-to-end 3007–4009 ms, of which LLM time-to-first-token 1101–2976 ms. After the model change
-and endpointing tuning: 1447–2341 ms (n=5). The table gets its final latency after milestone 3.
+and endpointing tuning: 1447–2341 ms (n=5). With the desk, on real calls to the deployed agent:
+1,385 ms median over 41 turns ([report](agent/reports/call-latency-20261001.md)).
 
 ## How it works
 
