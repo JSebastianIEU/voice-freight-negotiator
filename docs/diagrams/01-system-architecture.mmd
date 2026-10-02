@@ -11,8 +11,9 @@ flowchart LR
     subgraph worker["Agent worker (Python, Cloud Run)"]
         direction LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
-        STT --> TD["Turn detector<br/>LiveKit model"]
-        TD --> LLM["LLM<br/>GPT-4.1 mini"]
+        VAD --> TD["Turn detector<br/>LiveKit audio model"]
+        STT -->|"transcript"| LLM["LLM<br/>GPT-4.1 mini"]
+        TD -->|"turn over"| LLM
         LLM <-->|"verify_carrier · find_loads<br/>propose_rate · accept_rate"| PG["The desk (code)<br/>carrier directory · loads<br/>price limits"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]

@@ -41,8 +41,9 @@ flowchart LR
     subgraph worker["Agent worker (Python, Cloud Run)"]
         direction LR
         VAD["VAD<br/>Silero"] --> STT["STT<br/>Deepgram Nova-3"]
-        STT --> TD["Turn detector<br/>LiveKit model"]
-        TD --> LLM["LLM<br/>GPT-4.1 mini"]
+        VAD --> TD["Turn detector<br/>LiveKit audio model"]
+        STT -->|"transcript"| LLM["LLM<br/>GPT-4.1 mini"]
+        TD -->|"turn over"| LLM
         LLM <-->|"verify_carrier · find_loads<br/>propose_rate · accept_rate"| PG["The desk (code)<br/>carrier directory · loads<br/>price limits"]
         LLM --> OF["Output filter<br/>no unvalidated $ reaches TTS"]
         OF --> TTS["TTS<br/>Cartesia Sonic"]
@@ -107,7 +108,7 @@ audio in → VAD → STT → turn detection → LLM (+ price guardian tools) →
 |---|---|---|---|
 | VAD | Silero (runs locally in the worker) | Answers "is someone speaking right now?" every few ms | Cheap; gates the expensive STT stream and powers interruptions |
 | STT | Deepgram Nova-3 via LiveKit Inference | Streams partial transcripts as the carrier speaks | Streaming matters: we do not wait for silence to start transcribing |
-| Turn detection | LiveKit end-of-turn model, served by LiveKit Inference with an on-device fallback | Answers "did the carrier *finish*, or just pause?" from the transcript | See section 5. Negotiations are full of mid-number pauses |
+| Turn detection | LiveKit audio end-of-turn model, served by LiveKit Inference with an on-device fallback | Answers "did the carrier *finish*, or just pause?" from the audio: intonation, pitch, rhythm | See section 5. Negotiations are full of mid-number pauses |
 | LLM | GPT-4.1 mini (non-reasoning) via LiveKit Inference | Decides *what to say*, calls tools for prices | Chosen on measured time-to-first-token (ADR-003); a reasoning model's "thinking" would be dead air on the call |
 | Price guardian | Plain Python (`guardian/`) | Validates every amount against a range that lives in code | The LLM can be talked into anything. Code cannot |
 | Output filter | Plain Python | Scans the final text for dollar amounts the guardian did not approve | Defense in depth, see section 7 |
@@ -128,18 +129,24 @@ exactly that to replace the first model choice with a measured one, see ADR-003.
 
 They sound similar and are constantly confused. They answer different questions:
 
-| | VAD (Voice Activity Detection) | Turn detection (end-of-utterance) |
+| | VAD (Voice Activity Detection) | Turn detection (end of turn) |
 |---|---|---|
 | Question | Is there human speech in this 30 ms of audio? | Has this person finished their thought? |
-| Input | Raw audio energy / spectrum | Text (the transcript so far), sometimes plus audio |
-| Model | Silero, tiny, runs on CPU in the worker | LiveKit's transformer model, hosted by Inference (local fallback if unreachable) |
+| Input | Raw audio energy / spectrum | The audio itself: how the sentence is said (intonation, pitch, rhythm), not the transcript |
+| Model | Silero, tiny, runs on CPU in the worker | LiveKit's audio turn detector (`inference.TurnDetector`), hosted by Inference (local `v1-mini` fallback if unreachable) |
 | Typical mistake it prevents | Sending silence and keyboard noise to the STT bill | Answering after "I can do thirty-two..." before the "...fifty" arrives |
 
 Why this project cares more than a generic assistant: **negotiations are numbers said with
 pauses**. "Three thousand... two hundred", "I'd need... let me think... 2,900". A VAD-only
 system sees 400 ms of silence and hands the turn to the LLM, which then reacts to "three
-thousand" while the real offer was 3,200. The turn detector reads the transcript and knows an
-unfinished number is not an end of turn.
+thousand" while the real offer was 3,200. The turn detector listens to the voice: after
+"three thousand..." it has not come down the way it does at the end of a sentence, so the
+pause is not an end of turn.
+
+Its output is a probability, not a yes or no. Above its threshold the turn ends after
+`min_delay` of silence; below it the session waits up to `max_delay` for more speech.
+LiveKit's defaults are 0.5 s and 3 s; this project uses 0.3 s and 1.2 s (`config.py`), because
+3 s of silence after an unsure turn sounded like a dropped call.
 
 The test bench (milestone 6) measures exactly this: how often the agent interrupts the carrier
 mid-number.
