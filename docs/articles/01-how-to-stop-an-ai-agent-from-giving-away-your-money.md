@@ -465,5 +465,5 @@ currency dispute and the wording side channel were all green until someone read 
 
 The code, the attack catalog, every transcript and the figures in this article are public at
 [github.com/JSebastianIEU/voice-freight-negotiator](https://github.com/JSebastianIEU/voice-freight-negotiator).
-The live demo is at [web-smlbf5fpoa-ew.a.run.app](https://web-smlbf5fpoa-ew.a.run.app): pick a
+The live demo is at [talk-to-alex.web.app](https://talk-to-alex.web.app): pick a
 trucking company, pick a load, and try to talk Alex into overpaying, in English or Spanish.
