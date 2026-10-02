@@ -14,6 +14,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Render on every request. The site is served through Firebase Hosting
+// (talk-to-alex.web.app), whose CDN honours Cache-Control from Cloud Run: a statically
+// prerendered page would be cached there for a year and keep pointing at the chunks of
+// an old deploy. Hashed assets under /_next/static stay immutable and cacheable.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Voice Freight Negotiator",
   description:

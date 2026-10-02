@@ -21,6 +21,7 @@ push to main ─► GitHub Actions ─► docker build ×2 ─► Artifact Regis
 | `deploy/bootstrap.sh` | One-time project setup: APIs, registry, secrets, service accounts, Workload Identity Federation, budget alert |
 | `.github/workflows/ci.yml` | Every PR: ruff, pytest, eslint, tsc, `next build`, and a build of both images |
 | `.github/workflows/deploy.yml` | Push to `main`: build, push, deploy |
+| `firebase.json`, `.firebaserc` | Firebase Hosting site `talk-to-alex`: every path is rewritten to the `web` Cloud Run service |
 
 ## Why the worker is configured the way it is
 
@@ -105,6 +106,39 @@ Recorded because each one is a real operator lesson:
   the script retries.
 - **A budget must be in the billing account's currency** (COP here); any other currency is
   a bare `INVALID_ARGUMENT`.
+
+## The public address
+
+The demo is served at **https://talk-to-alex.web.app**. That is a free Firebase Hosting site,
+not a bought domain. Hosting serves nothing itself (`firebase/public` is empty) and rewrites
+every path to the `web` service on Cloud Run, always to its latest revision. A push to `main`
+therefore needs no Hosting release; one is only needed when `firebase.json` changes.
+
+Two things make this safe:
+
+- **Pages are rendered per request** (`export const dynamic = "force-dynamic"` in
+  `web/app/layout.tsx`). Hosting's CDN honours `Cache-Control` from Cloud Run, and Next marks
+  prerendered pages `s-maxage=31536000`: after a deploy the CDN would keep serving old HTML
+  that points at chunks the new revision no longer has. Rendered pages send `no-store`;
+  hashed files under `/_next/static` stay `immutable` and are cached, which is correct.
+- **Voice does not go through Hosting.** The browser only fetches the page and a token from
+  `/api/token` (already `no-store`) through it; audio and data go straight to LiveKit over
+  WebRTC, so Hosting's 60-second request limit does not apply to calls.
+
+The Cloud Run URL keeps working as before.
+
+One-time setup, from a machine with a browser (Node installed; the CLI runs through `npx`):
+
+```bash
+npx firebase-tools login
+npx firebase-tools projects:addfirebase voice-freight-negotiator
+npx firebase-tools hosting:sites:create talk-to-alex --project voice-freight-negotiator
+npx firebase-tools deploy --only hosting:talk-to-alex --project voice-freight-negotiator
+```
+
+`projects:addfirebase` only adds Firebase to the existing project; billing stays as it is
+(rewrites to Cloud Run need a project with billing, which this one has). The site name is
+global across Firebase: if it is taken, `hosting:sites:create` says so.
 
 ## Checking a deployment
 

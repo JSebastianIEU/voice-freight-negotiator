@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "site": "talk-to-alex",
+    "public": "firebase/public",
+    "ignore": ["**/.*"],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": { "serviceId": "web", "region": "europe-west1" }
+      }
+    ]
+  }
+}
