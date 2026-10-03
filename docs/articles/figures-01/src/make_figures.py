@@ -254,7 +254,7 @@ def fig_architecture():
     lx = 620
     s.box(lx, top + 90, 360, 96, "Room", "one per call, agent dispatched by name")
     s.box(lx, top + 210, 360, 96, "Inference gateway", "STT, LLM and TTS behind one key")
-    s.box(lx, top + 330, 360, 76, "Turn detector", "hosted end-of-utterance model")
+    s.box(lx, top + 330, 360, 76, "Turn detector", "hosted audio end-of-turn model")
     # worker items
     wx = 1144
     s.box(wx, top + 90, 380, 76, "Pipeline", "VAD → STT → turn → LLM → filter → TTS")
