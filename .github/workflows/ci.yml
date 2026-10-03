@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   agent:
-    name: agent · ruff + pytest
+    name: agent · ruff + pytest + coverage
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,10 +29,10 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       # Offline tests only; anything that calls a model is marked `integration`.
-      - run: uv run pytest -m "not integration"
+      - run: uv run pytest -m "not integration" --cov=freight_negotiator --cov-report=term
 
   web:
-    name: web · lint + typecheck + build
+    name: web · lint + test + typecheck + build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -46,6 +46,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
