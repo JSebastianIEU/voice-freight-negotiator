@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="860" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">System architecture</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Three processes. The browser never sees a secret or a number; the worker never sees a browser.</text>
+<rect x="56" y="130" width="420" height="640" rx="14" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="76" y="166" font-size="22" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Browser</text>
+<text x="76" y="190" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the showcase, Next.js</text>
+<rect x="600" y="130" width="400" height="640" rx="14" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="620" y="166" font-size="22" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LiveKit Cloud</text>
+<text x="620" y="190" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">managed media and inference</text>
+<rect x="1124" y="130" width="420" height="640" rx="14" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="1144" y="166" font-size="22" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Agent worker</text>
+<text x="1144" y="190" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Python on Cloud Run, always on</text>
+<rect x="76" y="220" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="266.0" y="254.0" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Microphone + speaker</text>
+<text x="266.0" y="278.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">WebRTC media over UDP</text>
+<rect x="76" y="316" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="266.0" y="350.0" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Transcript + orb + verdicts</text>
+<text x="266.0" y="374.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">data channel, topic "guardian"</text>
+<rect x="76" y="412" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="266.0" y="446.0" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">/api/token (server route)</text>
+<text x="266.0" y="470.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">mints a room token; the API secret stays here</text>
+<rect x="76" y="508" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="266.0" y="542.0" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Pick a carrier, pick a load</text>
+<text x="266.0" y="566.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">dispatch metadata: { loadId, lang }</text>
+<rect x="620" y="220" width="360" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="800.0" y="264.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Room</text>
+<text x="800.0" y="288.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">one per call, agent dispatched by name</text>
+<rect x="620" y="340" width="360" height="96" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="800.0" y="384.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Inference gateway</text>
+<text x="800.0" y="408.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">STT, LLM and TTS behind one key</text>
+<rect x="620" y="460" width="360" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="800.0" y="494.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Turn detector</text>
+<text x="800.0" y="518.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">hosted end-of-utterance model</text>
+<rect x="1144" y="220" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="1334.0" y="254.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Pipeline</text>
+<text x="1334.0" y="278.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">VAD → STT → turn → LLM → filter → TTS</text>
+<rect x="1144" y="316" width="380" height="96" rx="10" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1334.0" y="360.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The desk</text>
+<text x="1334.0" y="384.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">verify_carrier · find_loads · propose_rate · accept_rate</text>
+<rect x="1144" y="432" width="380" height="76" rx="10" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1334.0" y="466.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Output filter</text>
+<text x="1334.0" y="490.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">sentence by sentence, before TTS</text>
+<rect x="1144" y="528" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="1334.0" y="562.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Catalog + carrier directory</text>
+<text x="1334.0" y="586.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">loads, private ranges, MC numbers (JSON)</text>
+<rect x="1144" y="624" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
+<text x="1334.0" y="658.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Secrets</text>
+<text x="1334.0" y="682.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Secret Manager → env; CI deploys with WIF, no JSON keys</text>
+<line x1="456" y1="258" x2="620" y2="258" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="620" y1="258" x2="609.1946347717678" y2="263.21958640933474" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="620" y1="258" x2="609.1946347717678" y2="252.78041359066523" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="620" y1="278" x2="456" y2="278" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="456" y1="278" x2="466.8053652282321" y2="272.78041359066526" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="456" y1="278" x2="466.8053652282321" y2="283.21958640933474" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<text x="538" y="242" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">audio</text>
+<line x1="980" y1="258" x2="1144" y2="258" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="1144" y1="258" x2="1133.1946347717678" y2="263.21958640933474" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="1144" y1="258" x2="1133.1946347717678" y2="252.78041359066523" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="1144" y1="278" x2="980" y2="278" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="980" y1="278" x2="990.8053652282322" y2="272.78041359066526" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="980" y1="278" x2="990.8053652282322" y2="283.21958640933474" stroke="#52514e" stroke-width="2.5" stroke-linecap="round"/>
+<text x="1062" y="242" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">audio + data</text>
+<line x1="1144" y1="364" x2="980" y2="388" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="980" y1="388" x2="989.9356963444617" y2="381.27081445116494" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="980" y1="388" x2="991.4472800097067" y2="391.59996949700553" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="1062" y="356" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">STT / LLM / TTS calls</text>
+<line x1="456" y1="430" x2="620" y2="268" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="620" y1="268" x2="615.980816058201" y2="279.3069076427635" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="620" y1="268" x2="608.644630176215" y2="271.8801515647037" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="500" y="460" font-size="13" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">token + dispatch</text>
+<text x="620" y="600" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Desk events travel back to the browser</text>
+<text x="620" y="620" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">over the room's data channel:</text>
+<text x="620" y="648" font-size="13" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Mono, Menlo, monospace" opacity="1.0">carrier.verified · rate.proposed</text>
+<text x="620" y="670" font-size="13" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Mono, Menlo, monospace" opacity="1.0">rate.rejected · rate.accepted · call.ended</text>
+<text x="1544" y="830" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author.</text>
+</svg>
