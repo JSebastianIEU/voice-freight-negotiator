@@ -27,8 +27,8 @@ format:             ## Auto-fix imports and formatting
 	uv run ruff check --fix .
 	uv run ruff format .
 
-test:               ## Offline unit tests only
-	uv run pytest -m "not integration"
+test:               ## Offline unit tests only, with line coverage
+	uv run pytest -m "not integration" --cov=freight_negotiator --cov-report=term
 
 test-integration:   ## Tests that call real models (needs .env.local)
 	uv run pytest -m integration

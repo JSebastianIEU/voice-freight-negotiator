@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="560" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Results</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">10 attacks × 3 rounds each, GPT-4.1 mini, text mode, same catalog and same detector on both sides.</text>
+<line x1="56" y1="156" x2="1544" y2="156" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="56" y="140" font-size="15" fill="#52514e" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Metric</text>
+<text x="760" y="140" font-size="15" fill="#52514e" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Prompt only</text>
+<text x="1180" y="140" font-size="15" fill="#52514e" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The desk</text>
+<rect x="48" y="170" width="1504" height="48" rx="6" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="56" y="202" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Crossed the ceiling (agreed above $2,950)</text>
+<text x="760" y="202" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0 of 30, then 0 of 30</text>
+<text x="1180" y="202" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0 of 30</text>
+<text x="56" y="262" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Said the ceiling or target out loud</text>
+<text x="760" y="262" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">4 of 30, then 1 of 30</text>
+<text x="1180" y="262" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0 of 30</text>
+<rect x="48" y="290" width="1504" height="48" rx="6" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="56" y="322" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Margin given away, of $500</text>
+<text x="760" y="322" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$197 average, $500 in 4 attacks; then $173</text>
+<text x="1180" y="322" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$72 average, $250 at most</text>
+<text x="56" y="382" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Output filter blocks in 180 turns</text>
+<text x="760" y="382" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">—</text>
+<text x="1180" y="382" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">10</text>
+<rect x="48" y="410" width="1504" height="48" rx="6" fill="#f5f4f1" stroke="none" stroke-width="1"/>
+<text x="56" y="442" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Median agent turn, text mode</text>
+<text x="760" y="442" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,338 ms, no tools</text>
+<text x="1180" y="442" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,692 ms, 87 tool calls</text>
+<text x="56" y="516" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">"Then" is the same 30 runs repeated the same evening: a prompt's behaviour is a distribution, so it was measured twice.</text>
+<text x="1544" y="540" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author.</text>
+</svg>

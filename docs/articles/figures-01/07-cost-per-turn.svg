@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="560" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">What the desk costs per turn</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Median wall-clock time of one agent turn in text mode (no speech), 180 turns per run.</text>
+<line x1="520.0" y1="140" x2="520.0" y2="398" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="520.0" y="418" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0 ms</text>
+<line x1="745.0" y1="140" x2="745.0" y2="398" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="745.0" y="418" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">500 ms</text>
+<line x1="970.0" y1="140" x2="970.0" y2="398" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="970.0" y="418" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,000 ms</text>
+<line x1="1195.0" y1="140" x2="1195.0" y2="398" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="1195.0" y="418" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,500 ms</text>
+<line x1="1420.0" y1="140" x2="1420.0" y2="398" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="1420.0" y="418" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">2,000 ms</text>
+<text x="504" y="174" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Prompt only</text>
+<path d="M520,150 H1118.1 Q1122.1,150 1122.1,154 V170 Q1122.1,174 1118.1,174 H520 Z" fill="#2a78d6"/>
+<rect x="1128.1" y="148" width="96" height="28" rx="0" fill="#fcfcfb" stroke="none" stroke-width="1"/>
+<text x="1134.1" y="168" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,338 ms</text>
+<text x="504" y="196" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">0 tool calls in 180 turns</text>
+<text x="504" y="270" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Desk, first version</text>
+<path d="M520,246 H1160.4 Q1164.4,246 1164.4,250 V266 Q1164.4,270 1160.4,270 H520 Z" fill="#eb6834"/>
+<rect x="1170.4" y="244" width="96" height="28" rx="0" fill="#fcfcfb" stroke="none" stroke-width="1"/>
+<text x="1176.4" y="264" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,432 ms</text>
+<text x="504" y="292" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">58 tool calls in 180 turns</text>
+<text x="504" y="366" font-size="16" fill="#0b0b0b" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Desk, current (caller check, totals, currency)</text>
+<path d="M520,342 H1277.4 Q1281.4,342 1281.4,346 V362 Q1281.4,366 1277.4,366 H520 Z" fill="#eb6834"/>
+<rect x="1287.4" y="340" width="96" height="28" rx="0" fill="#fcfcfb" stroke="none" stroke-width="1"/>
+<text x="1293.4" y="360" font-size="16" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">1,692 ms</text>
+<text x="504" y="388" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">87 tool calls in 180 turns</text>
+<text x="56" y="500" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">About 350 ms more per turn than the prompt alone, for a turn that now verifies the caller and prices through code. On a real call the whole turn measured 1.4 to 2.3 s.</text>
+<text x="1544" y="540" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author. Data: the three replay reports in docs/attacks/</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="760" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Two paths under the same three numbers</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The anchor attack, round 1: the prompt-only agent's offers versus the desk's ladder. The ceiling is never offered.</text>
+<line x1="160" y1="600.0" x2="1220" y2="600.0" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="605.0" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,400</text>
+<line x1="160" y1="533.3333333333334" x2="1220" y2="533.3333333333334" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="538.3333333333334" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,500</text>
+<line x1="160" y1="466.66666666666663" x2="1220" y2="466.66666666666663" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="471.66666666666663" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,600</text>
+<line x1="160" y1="400.0" x2="1220" y2="400.0" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="405.0" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,700</text>
+<line x1="160" y1="333.3333333333333" x2="1220" y2="333.3333333333333" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="338.3333333333333" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,800</text>
+<line x1="160" y1="266.6666666666667" x2="1220" y2="266.6666666666667" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="271.6666666666667" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$2,900</text>
+<line x1="160" y1="200.0" x2="1220" y2="200.0" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="148" y="205.0" font-size="13" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">$3,000</text>
+<text x="292.5" y="628" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">opening offer</text>
+<text x="557.5" y="628" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">after "under $3,600"</text>
+<text x="822.5" y="628" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">after "$3,100, meet in the middle"</text>
+<text x="1087.5" y="628" font-size="13" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">after "$2,950 even"</text>
+<line x1="160" y1="233.33333333333331" x2="1220" y2="233.33333333333331" stroke="#e34948" stroke-width="2" stroke-linecap="round"/>
+<text x="168" y="223.33333333333331" font-size="14" fill="#e34948" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">ceiling $2,950: the wall, in code</text>
+<line x1="160" y1="400.0" x2="1220" y2="400.0" stroke="#52514e" stroke-width="1" stroke-linecap="round"/>
+<text x="1212" y="392.0" font-size="13" fill="#52514e" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">target $2,700</text>
+<path d="M292.5,566.6666666666666 L557.5,400.0 L822.5,400.0 L1087.5,233.33333333333331" stroke="#2a78d6" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M292.5,566.6666666666666 L557.5,483.3333333333333 L822.5,483.3333333333333 L1087.5,483.3333333333333" stroke="#eb6834" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="270.5" y1="566.6666666666666" x2="314.5" y2="566.6666666666666" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<line x1="535.5" y1="483.3333333333333" x2="579.5" y2="483.3333333333333" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<line x1="800.5" y1="400.0" x2="844.5" y2="400.0" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<line x1="1065.5" y1="316.6666666666667" x2="1109.5" y2="316.6666666666667" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<circle cx="292.5" cy="566.6666666666666" r="7" fill="#fcfcfb"/>
+<circle cx="292.5" cy="566.6666666666666" r="5" fill="#2a78d6"/>
+<circle cx="557.5" cy="400.0" r="7" fill="#fcfcfb"/>
+<circle cx="557.5" cy="400.0" r="5" fill="#2a78d6"/>
+<circle cx="822.5" cy="400.0" r="7" fill="#fcfcfb"/>
+<circle cx="822.5" cy="400.0" r="5" fill="#2a78d6"/>
+<circle cx="1087.5" cy="233.33333333333331" r="7" fill="#fcfcfb"/>
+<circle cx="1087.5" cy="233.33333333333331" r="5" fill="#2a78d6"/>
+<circle cx="292.5" cy="566.6666666666666" r="7" fill="#fcfcfb"/>
+<circle cx="292.5" cy="566.6666666666666" r="5" fill="#eb6834"/>
+<circle cx="557.5" cy="483.3333333333333" r="7" fill="#fcfcfb"/>
+<circle cx="557.5" cy="483.3333333333333" r="5" fill="#eb6834"/>
+<circle cx="822.5" cy="483.3333333333333" r="7" fill="#fcfcfb"/>
+<circle cx="822.5" cy="483.3333333333333" r="5" fill="#eb6834"/>
+<circle cx="1087.5" cy="483.3333333333333" r="7" fill="#fcfcfb"/>
+<circle cx="1087.5" cy="483.3333333333333" r="5" fill="#eb6834"/>
+<text x="1236" y="238.33333333333331" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">prompt only: $2,950,</text>
+<text x="1236" y="257.3333333333333" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">"the highest we can go"</text>
+<text x="1236" y="488.3333333333333" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the desk: holds $2,575</text>
+<text x="1236" y="507.3333333333333" font-size="13" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">while the caller keeps asking</text>
+<line x1="1236" y1="316.6666666666667" x2="1260" y2="316.6666666666667" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<text x="1266" y="321.6666666666667" font-size="13" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">last rung $2,825,</text>
+<text x="1236" y="340.6666666666667" font-size="13" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">only if the caller keeps coming down</text>
+<circle cx="166" cy="120" r="5" fill="#2a78d6"/>
+<text x="180" y="125" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">prompt only (milestone 2)</text>
+<circle cx="400" cy="120" r="5" fill="#eb6834"/>
+<text x="414" y="125" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the desk (current)</text>
+<line x1="580" y1="120" x2="604" y2="120" stroke="#eb6834" stroke-width="1" stroke-linecap="round"/>
+<text x="612" y="125" font-size="14" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the desk's ladder: $2,450 → $2,575 → $2,700 → $2,825</text>
+<text x="1544" y="740" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author. Data: the two anchor-attack transcripts in docs/attacks/</text>
+</svg>

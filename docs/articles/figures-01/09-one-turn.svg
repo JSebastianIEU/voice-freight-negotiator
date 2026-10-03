@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="940" viewBox="0 0 1600 940" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<rect width="1600" height="940" fill="#fcfcfb"/>
+<text x="56" y="52" font-size="30" fill="#0b0b0b" font-weight="bold" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">One negotiation turn, when the caller names a price</text>
+<text x="56" y="84" font-size="17" fill="#52514e" font-weight="normal" text-anchor="start" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">What happens between "thirty-one hundred" and Alex's answer. Orange steps are code, not model.</text>
+<rect x="40" y="116" width="180" height="44" rx="8" fill="#f5f4f1" stroke="none" stroke-width="1.5"/>
+<text x="130" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Caller</text>
+<line x1="130" y1="164" x2="130" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<rect x="310" y="116" width="180" height="44" rx="8" fill="#f5f4f1" stroke="none" stroke-width="1.5"/>
+<text x="400" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">STT + turn detector</text>
+<line x1="400" y1="164" x2="400" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<rect x="590" y="116" width="180" height="44" rx="8" fill="#f5f4f1" stroke="none" stroke-width="1.5"/>
+<text x="680" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">LLM</text>
+<line x1="680" y1="164" x2="680" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<rect x="870" y="116" width="180" height="44" rx="8" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="960" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">The desk</text>
+<line x1="960" y1="164" x2="960" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<rect x="1150" y="116" width="180" height="44" rx="8" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1240" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Output filter</text>
+<line x1="1240" y1="164" x2="1240" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<rect x="1390" y="116" width="180" height="44" rx="8" fill="#f5f4f1" stroke="none" stroke-width="1.5"/>
+<text x="1480" y="144" font-size="15" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">TTS</text>
+<line x1="1480" y1="164" x2="1480" y2="800" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round"/>
+<line x1="134" y1="210" x2="396" y2="210" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="396" y1="210" x2="385.1946347717679" y2="215.21958640933477" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="396" y1="210" x2="385.1946347717679" y2="204.78041359066523" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="265.0" y="200" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">"Thirty-one hundred and I'll book it right now."</text>
+<text x="265.0" y="232" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">audio over WebRTC; the detector waits until the sentence is really over</text>
+<line x1="404" y1="288" x2="676" y2="288" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="676" y1="288" x2="665.1946347717678" y2="293.21958640933474" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="676" y1="288" x2="665.1946347717678" y2="282.78041359066526" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="540.0" y="278" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">final transcript: "3100 and I'll book it right now"</text>
+<line x1="684" y1="366" x2="956" y2="366" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="956" y1="366" x2="945.1946347717678" y2="371.21958640933474" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="956" y1="366" x2="945.1946347717678" y2="360.78041359066526" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="820.0" y="356" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">propose_rate(load_id, carrier_ask_usd=3100, currency="USD")</text>
+<text x="820.0" y="388" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the model may not say a figure before asking</text>
+<rect x="810" y="418" width="300" height="76" rx="8" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="960" y="444" font-size="14" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">3,100 &gt; 2,950 ceiling → not approved</text>
+<text x="960" y="466" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">the ask came down from 3,600, so climb one rung:</text>
+<text x="960" y="484" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">counter = 2,575 · publish rate.rejected + rate.proposed</text>
+<line x1="956" y1="544" x2="684" y2="544" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
+<line x1="684" y1="544" x2="694.8053652282322" y2="538.7804135906653" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
+<line x1="684" y1="544" x2="694.8053652282322" y2="549.2195864093347" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
+<text x="820.0" y="534" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">"Not approved. Counter at $2,575 (say 'twenty-five seventy-five').</text>
+<text x="820.0" y="566" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Say no other dollar figure." No hint of how far above the ceiling 3,100 was.</text>
+<line x1="684" y1="622" x2="1236" y2="622" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1236" y1="622" x2="1225.1946347717678" y2="627.2195864093347" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1236" y1="622" x2="1225.1946347717678" y2="616.7804135906653" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="960.0" y="612" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">"I can't go that high. The best I can do is twenty-five seventy-five. This lane…"</text>
+<text x="960.0" y="644" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">streamed tokens, buffered into whole sentences</text>
+<rect x="1090" y="674" width="300" height="76" rx="8" fill="#fdeee7" stroke="#eb6834" stroke-width="1.5"/>
+<text x="1240" y="700" font-size="14" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">amounts found: 2,575</text>
+<text x="1240" y="722" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">2,575 was offered by the desk → speakable</text>
+<text x="1240" y="740" font-size="12" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">3,400 in a non-declining sentence would be replaced</text>
+<line x1="1244" y1="800" x2="1476" y2="800" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1476" y1="800" x2="1465.1946347717678" y2="805.2195864093347" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="1476" y1="800" x2="1465.1946347717678" y2="794.7804135906653" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="1360.0" y="790" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">sentence, cleared</text>
+<line x1="1476" y1="870" x2="134" y2="870" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="134" y1="870" x2="144.80536522823212" y2="864.7804135906653" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<line x1="134" y1="870" x2="144.80536522823212" y2="875.2195864093347" stroke="#52514e" stroke-width="2" stroke-linecap="round"/>
+<text x="805.0" y="860" font-size="14" fill="#0b0b0b" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Alex's voice, about 1.8 s after the caller's last word · the browser shows  $3,100 · blocked  and  $2,575 offered  from the desk's events</text>
+<text x="1544" y="920" font-size="12" fill="#8a8985" font-weight="normal" text-anchor="end" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Source: Image by the author.</text>
+</svg>
