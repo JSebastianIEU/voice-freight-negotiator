@@ -31,7 +31,7 @@
 <text x="800.0" y="408.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">STT, LLM and TTS behind one key</text>
 <rect x="620" y="460" width="360" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
 <text x="800.0" y="494.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Turn detector</text>
-<text x="800.0" y="518.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">hosted end-of-utterance model</text>
+<text x="800.0" y="518.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">hosted audio end-of-turn model</text>
 <rect x="1144" y="220" width="380" height="76" rx="10" fill="#fcfcfb" stroke="#52514e" stroke-width="1.5"/>
 <text x="1334.0" y="254.0" font-size="20" fill="#0b0b0b" font-weight="bold" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">Pipeline</text>
 <text x="1334.0" y="278.0" font-size="14" fill="#52514e" font-weight="normal" text-anchor="middle" font-family="Liberation Sans, Arial, Helvetica, sans-serif" opacity="1.0">VAD → STT → turn → LLM → filter → TTS</text>
