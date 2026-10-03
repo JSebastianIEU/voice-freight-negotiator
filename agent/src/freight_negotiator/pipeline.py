@@ -30,7 +30,7 @@ def load_vad() -> VAD:
     """
     return silero.VAD.load(
         # How long the user has to be silent before VAD reports "stopped speaking".
-        # Kept short: the *semantic* end-of-turn decision is the turn detector's job,
+        # Kept short: deciding that the speaker *finished* is the turn detector's job,
         # not VAD's, so VAD only needs to notice that audio stopped.
         min_silence_duration=0.4,
     )
@@ -42,9 +42,11 @@ def build_session(settings: Settings, vad: VAD, lang: str = "en") -> AgentSessio
     Why each piece is here rather than inside the agent class:
     - STT/LLM/TTS go through LiveKit Inference, so the only credential needed is
       the LiveKit one already in the environment.
-    - Turn detection is LiveKit's end-of-utterance model. It reads the transcript
-      and decides whether the speaker *finished* or just paused, which matters in
-      negotiations where numbers are said with pauses ("thirty-two... fifty").
+    - Turn detection is LiveKit's audio end-of-turn model. It listens to the
+      caller's audio (intonation, pitch, rhythm), not the transcript, and decides
+      whether the speaker *finished* or just paused, which matters in negotiations
+      where numbers are said with pauses: after "thirty-two..." the voice has not
+      come down yet, so the turn is not over before "...fifty".
       ``local_fallback`` keeps a small on-device model if the hosted one is slow.
     """
     return AgentSession(

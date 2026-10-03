@@ -89,7 +89,7 @@ carrier audio → VAD → STT → turn detection → LLM (+ price guardian tools
 | Framework | LiveKit Agents (Python) | pipeline, interruptions, turn detector, test framework, SIP later |
 | VAD | Silero | "is someone speaking?" — cheap, local, powers interruptions |
 | STT | Deepgram Nova-3 | streaming partials, good with numbers |
-| Turn detection | LiveKit turn-detector model | "did they finish, or pause mid-number?" |
+| Turn detection | LiveKit audio end-of-turn model | "did they finish, or pause mid-number?", from intonation and rhythm |
 | LLM | GPT-4.1 mini (non-reasoning) | chosen on measured time-to-first-token: 705 ms vs 2153 ms for DeepSeek V3 ([report](agent/reports/llm-latency-20260924-084336.md)); reasoning = silence on a call |
 | Price guardian | plain Python | wall, concession ladder and booking rule in code; tool replies carry one figure and no bound; output filter as second layer |
 | TTS | Cartesia Sonic | lowest time-to-first-byte |
