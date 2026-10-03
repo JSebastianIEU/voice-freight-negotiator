@@ -12,8 +12,8 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 | 2 | Negotiator with prompt-only limits, attack catalog, baseline failures | `feat/m2-negotiator` | 2–3 days | done |
 | 3 | Price guardian (range, policy, tools, output filter), attacks re-run | `feat/m3-price-guardian` | 2–3 days | done |
 | 4 | Deploy to GCP (Cloud Run, Secret Manager, GitHub Actions) | `feat/m4-gcp-deploy`, `fix/m4-public-web` | 1–2 days | done |
-| 4b | The showcase: caller check, holographic explainer, guided call, reveal, EN/ES | `feat/m4b-showcase` | 1 day | in review |
-| 5 | Publish: README with real numbers, demo video, article 1 | `docs/publish` | 1–2 days | planned |
+| 4b | The showcase: caller check, holographic explainer, guided call, reveal, EN/ES | `feat/m4b-showcase` | 1 day | done |
+| 5 | Publish: README with real numbers, public address, articles | `docs/real-call-latency`, `feat/talk-to-alex`, `chore/polish-for-review` | 1–2 days | in progress |
 | 6 | Test bench: fake carrier, 100 calls, model comparison, Spanish | `feat/m6-test-bench` | 20–30 h | later |
 
 ## Definition of done per milestone
@@ -97,9 +97,13 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [x] Attack replay re-run against the current desk (`results-20260925-211301-guardian.md`): 0/30 crossed, 0/30 leaked, $72 of $500 given on average, 10 filter blocks in 180 turns; README table updated
 
 ### 5 — Publish
-- [ ] README: measured numbers, demo video, live link, cost per call
-- [ ] Article 1 published on Medium
-- [ ] HappyRobot contacted with the repo and the article
+- [x] Public address without a bought domain: https://talk-to-alex.web.app (Firebase Hosting in front of Cloud Run)
+- [x] README with measured numbers only: attack replay, latency read back from real calls (`agent/reports/call-latency-20261001.md`), cost from list prices
+- [x] Tests for the tool wiring (agent) and the token endpoint (web); coverage reported in CI
+- [x] Article figures in `docs/articles/` (text on Medium, not in the repository)
+- [ ] Article 1 and article 2 published on Medium
+- [ ] Demo video
+- [ ] HappyRobot contacted with the repo and the articles
 
 ### 6 — Test bench
 - [ ] Fake carrier agent (cheap voice, persona: mood, accent, script)
@@ -107,10 +111,10 @@ this file as PRs merge. Effort estimates are for ~10 h/week alongside studies an
 - [ ] Report: latency, number-transcription errors, out-of-range prices, mid-number interruptions
 - [ ] LLM comparison: DeepSeek vs a fast Western model on TTFT, tool reliability, cost
 - [ ] Spanish attack replay (the Spanish Alex shipped in 4b; the replay still runs in English)
-- [ ] Article 2 published
+- [ ] Article 3 (the test bench results) published
 - [ ] Twilio SIP number attached to the deployed worker
 
 ## Rules that apply to every milestone
-- Numbers in the README come from a run recorded in `docs/attacks/` or `bench/reports/`. Placeholders stay `[X]` until then.
+- Numbers in the README come from a run recorded in the repository (`docs/attacks/`, `agent/reports/`, later `bench/reports/`). No placeholder numbers: a figure appears once a run backs it.
 - Every stack choice gets an ADR in `docs/decisions/` before or with the code that uses it.
 - Spend caps on LiveKit Cloud and a GCP budget alert before the first paid call.
