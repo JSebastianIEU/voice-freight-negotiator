@@ -159,3 +159,25 @@ docker build -f deploy/web.Dockerfile   -t freight-web   web/
 docker run --rm --env-file agent/.env.local -e PORT=8080 -p 8080:8080 freight-agent
 docker run --rm --env-file web/.env.local   -p 3000:8080 freight-web
 ```
+
+## The agent is offline
+
+The always-on agent was the only fixed cost (about $47 a month), so its Cloud Run service was
+deleted and `deploy.yml` deploys only the web app. The image in Artifact Registry, the
+secrets, the service accounts and `deploy/cloudrun/agent.yaml` are all still there. The page
+keeps working, and its scripted sample call too; a live call just finds no agent.
+
+To bring it back, from the repository root:
+
+```bash
+REGISTRY=europe-west1-docker.pkg.dev/voice-freight-negotiator/freight
+sed -e "s|__IMAGE__|$REGISTRY/agent:latest|g" \
+    -e "s|__PROJECT_ID__|voice-freight-negotiator|g" \
+    -e "s|__LIVEKIT_URL__|<your LIVEKIT_URL>|g" \
+    deploy/cloudrun/agent.yaml > /tmp/agent.yaml
+gcloud run services replace /tmp/agent.yaml --region europe-west1 --project voice-freight-negotiator
+```
+
+To keep it deployed on every push again, restore the agent steps in `deploy.yml` (git history of
+this file has them).
+

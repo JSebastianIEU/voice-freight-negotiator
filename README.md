@@ -2,15 +2,19 @@
 
 [![ci](https://github.com/JSebastianIEU/voice-freight-negotiator/actions/workflows/ci.yml/badge.svg)](https://github.com/JSebastianIEU/voice-freight-negotiator/actions/workflows/ci.yml)
 [![deploy](https://github.com/JSebastianIEU/voice-freight-negotiator/actions/workflows/deploy.yml/badge.svg)](https://github.com/JSebastianIEU/voice-freight-negotiator/actions/workflows/deploy.yml)
-[![live demo](https://img.shields.io/badge/live%20demo-talk--to--alex.web.app-2f6fd0)](https://talk-to-alex.web.app)
+[![demo video](https://img.shields.io/badge/demo%20video-92%20s-2f6fd0)](https://juansebastianpena.dev/videos/alex-demo.mp4)
 [![license: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 A real-time voice agent that negotiates freight rates with truckers, and can't be talked out
 of its price limits.
 
-**Try it at [talk-to-alex.web.app](https://talk-to-alex.web.app).** Pick a trucking company
-and a load, call Alex from the browser in English or Spanish, and try to talk it into
-overpaying. No microphone? The page plays a sample call.
+**[Watch the 92-second demo](https://juansebastianpena.dev/videos/alex-demo.mp4)**: a full call on the real interface, with Alex's
+production voice. You pick a trucking company and a load, call Alex from the browser in
+English or Spanish, and try to talk it into overpaying.
+
+The live agent is offline to save its always-on cost. The page at
+[talk-to-alex.web.app](https://talk-to-alex.web.app) still plays the scripted sample call, and
+one deploy brings the agent back ([how](docs/deploy.md#the-agent-is-offline)).
 
 ![The call screen](docs/articles/figures-02/08-call-screen.png)
 
@@ -106,7 +110,8 @@ browser.
 
 ## Deploy
 
-GitHub Actions deploys both services to Cloud Run on every push to `main`, authenticated with
+GitHub Actions deploys the web app to Cloud Run on every push to `main` (the agent's deploy is
+off while it is offline), authenticated with
 Workload Identity Federation, so no key file exists anywhere. One script sets up a new Google
 Cloud project: APIs, registry, secrets, service accounts, the identity pool and a budget
 alert. The agent is pinned to one always-on instance because it keeps a connection open to
@@ -115,7 +120,8 @@ on the first deploy: [docs/deploy.md](docs/deploy.md).
 
 ## Cost
 
-- **Google Cloud:** the always-on agent is the only fixed cost, about **$47 a month** at
+- **Google Cloud:** nothing fixed while the agent is offline. Running, the always-on agent is
+  the only fixed cost, about **$47 a month** at
   [Cloud Run's list price](https://cloud.google.com/run/pricing) in europe-west1 (1 vCPU and
   1 GiB, instance-based billing, after the monthly free tier). The web app costs nothing while
   idle.
